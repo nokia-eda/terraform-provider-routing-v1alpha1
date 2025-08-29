@@ -1,0 +1,135 @@
+provider:
+  name: routing
+
+data_sources:
+  app_group:
+    read:
+      path: /apps/routing.eda.nokia.com
+      method: GET
+
+  attachment_lookup:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}
+      method: GET
+
+  attachment_lookup_list:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups
+      method: GET
+
+  default_interface:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
+      method: GET
+
+  default_interface_list:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces
+      method: GET
+
+  default_router:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
+      method: GET
+
+  default_router_list:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters
+      method: GET
+
+  drain:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: GET
+
+  drain_list:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains
+      method: GET
+
+  resource_list:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1
+      method: GET
+
+  route_lookup:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}
+      method: GET
+
+  route_lookup_list:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups
+      method: GET
+
+  system_interface:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: GET
+
+  system_interface_list:
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces
+      method: GET
+
+  workflow_get_inputs_resp_elem:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}/_input
+      method: GET
+
+resources:
+  default_interface:
+    create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces
+      method: POST
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
+      method: GET
+    update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
+      method: PUT
+    delete:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
+      method: DELETE
+
+  default_router:
+    create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters
+      method: POST
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
+      method: GET
+    update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
+      method: PUT
+    delete:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
+      method: DELETE
+
+  drain:
+    create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains
+      method: POST
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: GET
+    update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: PUT
+    delete:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: DELETE
+
+  system_interface:
+    create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces
+      method: POST
+    read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: GET
+    update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: PUT
+    delete:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: DELETE
