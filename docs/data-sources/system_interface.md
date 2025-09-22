@@ -40,8 +40,8 @@ Optional:
 - `bfd` (Attributes) Enable or disable BFD on this SystemInterface. (see [below for nested schema](#nestedatt--spec--bfd))
 - `default_router` (String) Reference to a DefaultRouter.
 - `description` (String) The description of the SystemInterface.
-- `ipv4address` (String) IPv4 address in ip/mask form, e.g., 192.168.0.1/32.
-- `ipv6address` (String) IPv6 address in ip/mask form, e.g., fc00::1/128.
+- `ipv4_address` (String) IPv4 address in ip/mask form, e.g., 192.168.0.1/32.
+- `ipv6_address` (String) IPv6 address in ip/mask form, e.g., fc00::1/128.
 
 <a id="nestedatt--spec--bfd"></a>
 ### Nested Schema for `spec.bfd`

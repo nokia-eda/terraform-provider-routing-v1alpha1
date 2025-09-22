@@ -23,7 +23,7 @@ description: |-
 
 - `fields` (String) a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.
 - `filter` (String) an EQL "where" expression that will be used to filter the set of resources returned.
-- `labelselector` (String) a label selector string to filter the results based on CR labels
+- `label_selector` (String) a label selector string to filter the results based on CR labels
 
 ### Read-Only
 
@@ -67,29 +67,29 @@ Optional:
 - `ebgp_preference` (Number) Preference to be set for eBGP.
 - `enabled` (Boolean) Enables BGP in the default VRF.
 - `ibgp_preference` (Number) Preference to be set for iBGP.
-- `ipv4unicast` (Attributes) Parameters relating to the IPv4 unicast AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv4unicast))
-- `ipv6unicast` (Attributes) Parameters relating to the IPv6 unicast AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv6unicast))
+- `ipv4_unicast` (Attributes) Parameters relating to the IPv4 unicast AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv4_unicast))
+- `ipv6_unicast` (Attributes) Parameters relating to the IPv6 unicast AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv6_unicast))
 - `keychain` (String) Keychain to be used for authentication
-- `l2vpnevpn` (Attributes) Parameters relating to the EVPN AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--l2vpnevpn))
+- `l2_vpn_evpn` (Attributes) Parameters relating to the EVPN AFI/SAFI. (see [below for nested schema](#nestedatt--items--spec--bgp--l2_vpn_evpn))
 - `min_wait_to_advertise` (Number) Minimum wait time before advertising routes post BGP restart.
 - `rapid_withdrawl` (Boolean) Enable rapid withdrawal in BGP.
 - `send_community_large` (Boolean) When false, all large (12 byte) BGP communities from all outbound routes advertised to the peer are stripped.
 - `send_community_standard` (Boolean) When false, all standard (4 byte) communities from all outbound routes advertised to the peer are stripped.
 - `wait_for_fib_install` (Boolean) Wait for FIB installation before advertising routes.
 
-<a id="nestedatt--items--spec--bgp--ipv4unicast"></a>
-### Nested Schema for `items.spec.bgp.ipv4unicast`
+<a id="nestedatt--items--spec--bgp--ipv4_unicast"></a>
+### Nested Schema for `items.spec.bgp.ipv4_unicast`
 
 Optional:
 
-- `advertise_ipv6next_hops` (Boolean) Enables advertisement of IPv4 Unicast routes with IPv6 next-hops to peers.
+- `advertise_ipv6_next_hops` (Boolean) Enables advertisement of IPv4 Unicast routes with IPv6 next-hops to peers.
 - `enabled` (Boolean) Enables the IPv4 unicast AFISAFI.
-- `multipath` (Attributes) Enable multipath. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv4unicast--multipath))
+- `multipath` (Attributes) Enable multipath. (see [below for nested schema](#nestedatt--items--spec--bgp--ipv4_unicast--multipath))
 - `rapid_update` (Boolean) Enables rapid update.
-- `receive_ipv6next_hops` (Boolean) Enables the advertisement of the RFC 5549 capability to receive IPv4 routes with IPv6 next-hops.
+- `receive_ipv6_next_hops` (Boolean) Enables the advertisement of the RFC 5549 capability to receive IPv4 routes with IPv6 next-hops.
 
-<a id="nestedatt--items--spec--bgp--ipv4unicast--multipath"></a>
-### Nested Schema for `items.spec.bgp.ipv4unicast.multipath`
+<a id="nestedatt--items--spec--bgp--ipv4_unicast--multipath"></a>
+### Nested Schema for `items.spec.bgp.ipv4_unicast.multipath`
 
 Optional:
 
@@ -98,17 +98,17 @@ Optional:
 
 
 
-<a id="nestedatt--items--spec--bgp--ipv6unicast"></a>
-### Nested Schema for `items.spec.bgp.ipv6unicast`
+<a id="nestedatt--items--spec--bgp--ipv6_unicast"></a>
+### Nested Schema for `items.spec.bgp.ipv6_unicast`
 
 Optional:
 
 - `enabled` (Boolean) Enables the IPv6 unicast AFISAFI
-- `multipath_1` (Attributes) Enable multipath (see [below for nested schema](#nestedatt--items--spec--bgp--ipv6unicast--multipath_1))
+- `multipath` (Attributes) Enable multipath (see [below for nested schema](#nestedatt--items--spec--bgp--ipv6_unicast--multipath))
 - `rapid_update` (Boolean) Enables rapid update.
 
-<a id="nestedatt--items--spec--bgp--ipv6unicast--multipath_1"></a>
-### Nested Schema for `items.spec.bgp.ipv6unicast.multipath_1`
+<a id="nestedatt--items--spec--bgp--ipv6_unicast--multipath"></a>
+### Nested Schema for `items.spec.bgp.ipv6_unicast.multipath`
 
 Optional:
 
@@ -117,19 +117,19 @@ Optional:
 
 
 
-<a id="nestedatt--items--spec--bgp--l2vpnevpn"></a>
-### Nested Schema for `items.spec.bgp.l2vpnevpn`
+<a id="nestedatt--items--spec--bgp--l2_vpn_evpn"></a>
+### Nested Schema for `items.spec.bgp.l2_vpn_evpn`
 
 Optional:
 
-- `advertise_ipv6next_hops` (Boolean) Enables advertisement of EVPN routes with IPv6 next-hops to peers.
+- `advertise_ipv6_next_hops` (Boolean) Enables advertisement of EVPN routes with IPv6 next-hops to peers.
 - `enabled` (Boolean) Enables the L2VPN EVPN AFISAFI.
 - `inter_asvpn` (Boolean) Enable inter-AS VPN for EVPN.
-- `multipath_2` (Attributes) Enable multipath (see [below for nested schema](#nestedatt--items--spec--bgp--l2vpnevpn--multipath_2))
+- `multipath` (Attributes) Enable multipath (see [below for nested schema](#nestedatt--items--spec--bgp--l2_vpn_evpn--multipath))
 - `rapid_update` (Boolean) Enables rapid update.
 
-<a id="nestedatt--items--spec--bgp--l2vpnevpn--multipath_2"></a>
-### Nested Schema for `items.spec.bgp.l2vpnevpn.multipath_2`
+<a id="nestedatt--items--spec--bgp--l2_vpn_evpn--multipath"></a>
+### Nested Schema for `items.spec.bgp.l2_vpn_evpn.multipath`
 
 Optional:
 

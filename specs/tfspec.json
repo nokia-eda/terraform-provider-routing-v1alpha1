@@ -255,7 +255,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -601,7 +601,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv4addresses",
+                                    "name": "ipv4_addresses",
                                     "list_nested": {
                                         "computed_optional_required": "optional",
                                         "nested_object": {
@@ -626,7 +626,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv6addresses",
+                                    "name": "ipv6_addresses",
                                     "list_nested": {
                                         "computed_optional_required": "optional",
                                         "nested_object": {
@@ -727,7 +727,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -887,7 +887,7 @@
                                                     }
                                                 },
                                                 {
-                                                    "name": "ipv4addresses",
+                                                    "name": "ipv4_addresses",
                                                     "list_nested": {
                                                         "computed_optional_required": "optional",
                                                         "nested_object": {
@@ -912,7 +912,7 @@
                                                     }
                                                 },
                                                 {
-                                                    "name": "ipv6addresses",
+                                                    "name": "ipv6_addresses",
                                                     "list_nested": {
                                                         "computed_optional_required": "optional",
                                                         "nested_object": {
@@ -1118,12 +1118,12 @@
                                                 }
                                             },
                                             {
-                                                "name": "ipv4unicast",
+                                                "name": "ipv4_unicast",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
                                                         {
-                                                            "name": "advertise_ipv6next_hops",
+                                                            "name": "advertise_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables advertisement of IPv4 Unicast routes with IPv6 next-hops to peers."
@@ -1167,7 +1167,7 @@
                                                             }
                                                         },
                                                         {
-                                                            "name": "receive_ipv6next_hops",
+                                                            "name": "receive_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables the advertisement of the RFC 5549 capability to receive IPv4 routes with IPv6 next-hops."
@@ -1178,7 +1178,7 @@
                                                 }
                                             },
                                             {
-                                                "name": "ipv6unicast",
+                                                "name": "ipv6_unicast",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
@@ -1231,12 +1231,12 @@
                                                 }
                                             },
                                             {
-                                                "name": "l2vpnevpn",
+                                                "name": "l2_vpn_evpn",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
                                                         {
-                                                            "name": "advertise_ipv6next_hops",
+                                                            "name": "advertise_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables advertisement of EVPN routes with IPv6 next-hops to peers."
@@ -1456,7 +1456,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -1570,12 +1570,12 @@
                                                                 }
                                                             },
                                                             {
-                                                                "name": "ipv4unicast",
+                                                                "name": "ipv4_unicast",
                                                                 "single_nested": {
                                                                     "computed_optional_required": "optional",
                                                                     "attributes": [
                                                                         {
-                                                                            "name": "advertise_ipv6next_hops",
+                                                                            "name": "advertise_ipv6_next_hops",
                                                                             "bool": {
                                                                                 "computed_optional_required": "optional",
                                                                                 "description": "Enables advertisement of IPv4 Unicast routes with IPv6 next-hops to peers."
@@ -1619,7 +1619,7 @@
                                                                             }
                                                                         },
                                                                         {
-                                                                            "name": "receive_ipv6next_hops",
+                                                                            "name": "receive_ipv6_next_hops",
                                                                             "bool": {
                                                                                 "computed_optional_required": "optional",
                                                                                 "description": "Enables the advertisement of the RFC 5549 capability to receive IPv4 routes with IPv6 next-hops."
@@ -1630,7 +1630,7 @@
                                                                 }
                                                             },
                                                             {
-                                                                "name": "ipv6unicast",
+                                                                "name": "ipv6_unicast",
                                                                 "single_nested": {
                                                                     "computed_optional_required": "optional",
                                                                     "attributes": [
@@ -1683,12 +1683,12 @@
                                                                 }
                                                             },
                                                             {
-                                                                "name": "l2vpnevpn",
+                                                                "name": "l2_vpn_evpn",
                                                                 "single_nested": {
                                                                     "computed_optional_required": "optional",
                                                                     "attributes": [
                                                                         {
-                                                                            "name": "advertise_ipv6next_hops",
+                                                                            "name": "advertise_ipv6_next_hops",
                                                                             "bool": {
                                                                                 "computed_optional_required": "optional",
                                                                                 "description": "Enables advertisement of EVPN routes with IPv6 next-hops to peers."
@@ -2051,7 +2051,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -2568,7 +2568,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -3015,14 +3015,14 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv4address",
+                                    "name": "ipv4_address",
                                     "string": {
                                         "computed_optional_required": "optional",
                                         "description": "IPv4 address in ip/mask form, e.g., 192.168.0.1/32."
                                     }
                                 },
                                 {
-                                    "name": "ipv6address",
+                                    "name": "ipv6_address",
                                     "string": {
                                         "computed_optional_required": "optional",
                                         "description": "IPv6 address in ip/mask form, e.g., fc00::1/128."
@@ -3091,7 +3091,7 @@
                         }
                     },
                     {
-                        "name": "labelselector",
+                        "name": "label_selector",
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "a label selector string to filter the results based on CR labels"
@@ -3237,14 +3237,14 @@
                                                     }
                                                 },
                                                 {
-                                                    "name": "ipv4address",
+                                                    "name": "ipv4_address",
                                                     "string": {
                                                         "computed_optional_required": "optional",
                                                         "description": "IPv4 address in ip/mask form, e.g., 192.168.0.1/32."
                                                     }
                                                 },
                                                 {
-                                                    "name": "ipv6address",
+                                                    "name": "ipv6_address",
                                                     "string": {
                                                         "computed_optional_required": "optional",
                                                         "description": "IPv6 address in ip/mask form, e.g., fc00::1/128."
@@ -3669,7 +3669,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv4addresses",
+                                    "name": "ipv4_addresses",
                                     "list_nested": {
                                         "computed_optional_required": "optional",
                                         "nested_object": {
@@ -3694,7 +3694,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv6addresses",
+                                    "name": "ipv6_addresses",
                                     "list_nested": {
                                         "computed_optional_required": "optional",
                                         "nested_object": {
@@ -4013,12 +4013,12 @@
                                                 }
                                             },
                                             {
-                                                "name": "ipv4unicast",
+                                                "name": "ipv4_unicast",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
                                                         {
-                                                            "name": "advertise_ipv6next_hops",
+                                                            "name": "advertise_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables advertisement of IPv4 Unicast routes with IPv6 next-hops to peers."
@@ -4077,7 +4077,7 @@
                                                             }
                                                         },
                                                         {
-                                                            "name": "receive_ipv6next_hops",
+                                                            "name": "receive_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables the advertisement of the RFC 5549 capability to receive IPv4 routes with IPv6 next-hops."
@@ -4088,7 +4088,7 @@
                                                 }
                                             },
                                             {
-                                                "name": "ipv6unicast",
+                                                "name": "ipv6_unicast",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
@@ -4156,12 +4156,12 @@
                                                 }
                                             },
                                             {
-                                                "name": "l2vpnevpn",
+                                                "name": "l2_vpn_evpn",
                                                 "single_nested": {
                                                     "computed_optional_required": "optional",
                                                     "attributes": [
                                                         {
-                                                            "name": "advertise_ipv6next_hops",
+                                                            "name": "advertise_ipv6_next_hops",
                                                             "bool": {
                                                                 "computed_optional_required": "optional",
                                                                 "description": "Enables advertisement of EVPN routes with IPv6 next-hops to peers."
@@ -4866,14 +4866,14 @@
                                     }
                                 },
                                 {
-                                    "name": "ipv4address",
+                                    "name": "ipv4_address",
                                     "string": {
                                         "computed_optional_required": "optional",
                                         "description": "IPv4 address in ip/mask form, e.g., 192.168.0.1/32."
                                     }
                                 },
                                 {
-                                    "name": "ipv6address",
+                                    "name": "ipv6_address",
                                     "string": {
                                         "computed_optional_required": "optional",
                                         "description": "IPv6 address in ip/mask form, e.g., fc00::1/128."

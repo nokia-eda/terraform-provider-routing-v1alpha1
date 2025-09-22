@@ -118,12 +118,12 @@ func SystemInterfaceDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The description of the SystemInterface.",
 						MarkdownDescription: "The description of the SystemInterface.",
 					},
-					"ipv4address": schema.StringAttribute{
+					"ipv4_address": schema.StringAttribute{
 						Optional:            true,
 						Description:         "IPv4 address in ip/mask form, e.g., 192.168.0.1/32.",
 						MarkdownDescription: "IPv4 address in ip/mask form, e.g., 192.168.0.1/32.",
 					},
-					"ipv6address": schema.StringAttribute{
+					"ipv6_address": schema.StringAttribute{
 						Optional:            true,
 						Description:         "IPv6 address in ip/mask form, e.g., fc00::1/128.",
 						MarkdownDescription: "IPv6 address in ip/mask form, e.g., fc00::1/128.",
@@ -815,40 +815,40 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
 	}
 
-	ipv4addressAttribute, ok := attributes["ipv4address"]
+	ipv4AddressAttribute, ok := attributes["ipv4_address"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`ipv4address is missing from object`)
+			`ipv4_address is missing from object`)
 
 		return nil, diags
 	}
 
-	ipv4addressVal, ok := ipv4addressAttribute.(basetypes.StringValue)
+	ipv4AddressVal, ok := ipv4AddressAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`ipv4address expected to be basetypes.StringValue, was: %T`, ipv4addressAttribute))
+			fmt.Sprintf(`ipv4_address expected to be basetypes.StringValue, was: %T`, ipv4AddressAttribute))
 	}
 
-	ipv6addressAttribute, ok := attributes["ipv6address"]
+	ipv6AddressAttribute, ok := attributes["ipv6_address"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`ipv6address is missing from object`)
+			`ipv6_address is missing from object`)
 
 		return nil, diags
 	}
 
-	ipv6addressVal, ok := ipv6addressAttribute.(basetypes.StringValue)
+	ipv6AddressVal, ok := ipv6AddressAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`ipv6address expected to be basetypes.StringValue, was: %T`, ipv6addressAttribute))
+			fmt.Sprintf(`ipv6_address expected to be basetypes.StringValue, was: %T`, ipv6AddressAttribute))
 	}
 
 	if diags.HasError() {
@@ -859,8 +859,8 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 		Bfd:           bfdVal,
 		DefaultRouter: defaultRouterVal,
 		Description:   descriptionVal,
-		Ipv4address:   ipv4addressVal,
-		Ipv6address:   ipv6addressVal,
+		Ipv4Address:   ipv4AddressVal,
+		Ipv6Address:   ipv6AddressVal,
 		state:         attr.ValueStateKnown,
 	}, diags
 }
@@ -982,40 +982,40 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
 	}
 
-	ipv4addressAttribute, ok := attributes["ipv4address"]
+	ipv4AddressAttribute, ok := attributes["ipv4_address"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`ipv4address is missing from object`)
+			`ipv4_address is missing from object`)
 
 		return NewSpecValueUnknown(), diags
 	}
 
-	ipv4addressVal, ok := ipv4addressAttribute.(basetypes.StringValue)
+	ipv4AddressVal, ok := ipv4AddressAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`ipv4address expected to be basetypes.StringValue, was: %T`, ipv4addressAttribute))
+			fmt.Sprintf(`ipv4_address expected to be basetypes.StringValue, was: %T`, ipv4AddressAttribute))
 	}
 
-	ipv6addressAttribute, ok := attributes["ipv6address"]
+	ipv6AddressAttribute, ok := attributes["ipv6_address"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`ipv6address is missing from object`)
+			`ipv6_address is missing from object`)
 
 		return NewSpecValueUnknown(), diags
 	}
 
-	ipv6addressVal, ok := ipv6addressAttribute.(basetypes.StringValue)
+	ipv6AddressVal, ok := ipv6AddressAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`ipv6address expected to be basetypes.StringValue, was: %T`, ipv6addressAttribute))
+			fmt.Sprintf(`ipv6_address expected to be basetypes.StringValue, was: %T`, ipv6AddressAttribute))
 	}
 
 	if diags.HasError() {
@@ -1026,8 +1026,8 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 		Bfd:           bfdVal,
 		DefaultRouter: defaultRouterVal,
 		Description:   descriptionVal,
-		Ipv4address:   ipv4addressVal,
-		Ipv6address:   ipv6addressVal,
+		Ipv4Address:   ipv4AddressVal,
+		Ipv6Address:   ipv6AddressVal,
 		state:         attr.ValueStateKnown,
 	}, diags
 }
@@ -1103,8 +1103,8 @@ type SpecValue struct {
 	Bfd           basetypes.ObjectValue `tfsdk:"bfd"`
 	DefaultRouter basetypes.StringValue `tfsdk:"default_router"`
 	Description   basetypes.StringValue `tfsdk:"description"`
-	Ipv4address   basetypes.StringValue `tfsdk:"ipv4address"`
-	Ipv6address   basetypes.StringValue `tfsdk:"ipv6address"`
+	Ipv4Address   basetypes.StringValue `tfsdk:"ipv4_address"`
+	Ipv6Address   basetypes.StringValue `tfsdk:"ipv6_address"`
 	state         attr.ValueState
 }
 
@@ -1119,8 +1119,8 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	}.TerraformType(ctx)
 	attrTypes["default_router"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["description"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["ipv4address"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["ipv6address"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["ipv4_address"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["ipv6_address"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
@@ -1152,21 +1152,21 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 
 		vals["description"] = val
 
-		val, err = v.Ipv4address.ToTerraformValue(ctx)
+		val, err = v.Ipv4Address.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["ipv4address"] = val
+		vals["ipv4_address"] = val
 
-		val, err = v.Ipv6address.ToTerraformValue(ctx)
+		val, err = v.Ipv6Address.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["ipv6address"] = val
+		vals["ipv6_address"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -1224,8 +1224,8 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		},
 		"default_router": basetypes.StringType{},
 		"description":    basetypes.StringType{},
-		"ipv4address":    basetypes.StringType{},
-		"ipv6address":    basetypes.StringType{},
+		"ipv4_address":   basetypes.StringType{},
+		"ipv6_address":   basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -1242,8 +1242,8 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 			"bfd":            bfd,
 			"default_router": v.DefaultRouter,
 			"description":    v.Description,
-			"ipv4address":    v.Ipv4address,
-			"ipv6address":    v.Ipv6address,
+			"ipv4_address":   v.Ipv4Address,
+			"ipv6_address":   v.Ipv6Address,
 		})
 
 	return objVal, diags
@@ -1276,11 +1276,11 @@ func (v SpecValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.Ipv4address.Equal(other.Ipv4address) {
+	if !v.Ipv4Address.Equal(other.Ipv4Address) {
 		return false
 	}
 
-	if !v.Ipv6address.Equal(other.Ipv6address) {
+	if !v.Ipv6Address.Equal(other.Ipv6Address) {
 		return false
 	}
 
@@ -1302,8 +1302,8 @@ func (v SpecValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		},
 		"default_router": basetypes.StringType{},
 		"description":    basetypes.StringType{},
-		"ipv4address":    basetypes.StringType{},
-		"ipv6address":    basetypes.StringType{},
+		"ipv4_address":   basetypes.StringType{},
+		"ipv6_address":   basetypes.StringType{},
 	}
 }
 

@@ -55,8 +55,8 @@ Optional:
 - `bfd` (Attributes) Enable or disable BFD on this DefaultInterface. (see [below for nested schema](#nestedatt--spec--bfd))
 - `description` (String) The description of the DefaultInterface.
 - `ip_mtu` (Number) Set the IP MTU for the DefaultInterface.
-- `ipv4addresses` (Attributes List) List of IPv4 addresses in ip/mask form, e.g., 192.168.0.1/24. (see [below for nested schema](#nestedatt--spec--ipv4addresses))
-- `ipv6addresses` (Attributes List) List of IPv6 addresses in ip/mask form, e.g., fc00::1/120. (see [below for nested schema](#nestedatt--spec--ipv6addresses))
+- `ipv4_addresses` (Attributes List) List of IPv4 addresses in ip/mask form, e.g., 192.168.0.1/24. (see [below for nested schema](#nestedatt--spec--ipv4_addresses))
+- `ipv6_addresses` (Attributes List) List of IPv6 addresses in ip/mask form, e.g., fc00::1/120. (see [below for nested schema](#nestedatt--spec--ipv6_addresses))
 - `unnumbered` (String) Enables the use of unnumbered interfaces on the ISL. For IPv6, no IP address are configured on the sub-interface and only the link local address will be used. If any allocation pool is specified for IPv6 that will take precedence and IPs will be assigned to the interfaces.  When using eBGP for an underlay protocol, the DefaultInterfaces which are a part of the ISL will be added to the BGP dynamic neighbor list.
 - `vlan_id` (Number) VLAN to use with this DefaultInterface.
 
@@ -73,8 +73,8 @@ Optional:
 - `ttl` (Number) Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.
 
 
-<a id="nestedatt--spec--ipv4addresses"></a>
-### Nested Schema for `spec.ipv4addresses`
+<a id="nestedatt--spec--ipv4_addresses"></a>
+### Nested Schema for `spec.ipv4_addresses`
 
 Required:
 
@@ -85,8 +85,8 @@ Optional:
 - `primary` (Boolean) Indicates which address to use as primary for broadcast
 
 
-<a id="nestedatt--spec--ipv6addresses"></a>
-### Nested Schema for `spec.ipv6addresses`
+<a id="nestedatt--spec--ipv6_addresses"></a>
+### Nested Schema for `spec.ipv6_addresses`
 
 Required:
 

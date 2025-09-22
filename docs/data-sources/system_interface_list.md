@@ -23,7 +23,7 @@ description: |-
 
 - `fields` (String) a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.
 - `filter` (String) an EQL "where" expression that will be used to filter the set of resources returned.
-- `labelselector` (String) a label selector string to filter the results based on CR labels
+- `label_selector` (String) a label selector string to filter the results based on CR labels
 
 ### Read-Only
 
@@ -53,8 +53,8 @@ Optional:
 - `bfd` (Attributes) Enable or disable BFD on this SystemInterface. (see [below for nested schema](#nestedatt--items--spec--bfd))
 - `default_router` (String) Reference to a DefaultRouter.
 - `description` (String) The description of the SystemInterface.
-- `ipv4address` (String) IPv4 address in ip/mask form, e.g., 192.168.0.1/32.
-- `ipv6address` (String) IPv6 address in ip/mask form, e.g., fc00::1/128.
+- `ipv4_address` (String) IPv4 address in ip/mask form, e.g., 192.168.0.1/32.
+- `ipv6_address` (String) IPv6 address in ip/mask form, e.g., fc00::1/128.
 
 <a id="nestedatt--items--spec--bfd"></a>
 ### Nested Schema for `items.spec.bfd`
