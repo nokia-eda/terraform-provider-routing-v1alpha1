@@ -3,6 +3,34 @@ app_group:
       path: /apps/routing.eda.nokia.com
       method: GET
 
+intent_targets:
+  - read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_targets
+      method: GET
+  - read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_targets
+      method: GET
+  - read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_targets
+      method: GET
+  - read:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_targets
+      method: GET
+
+k8_s_topology_request:
+  - create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_topology
+      method: POST
+  - create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_topology
+      method: POST
+  - create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_topology
+      method: POST
+  - create:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_topology
+      method: POST
+
 patch:
   - update:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
@@ -76,6 +104,9 @@ workflow_get_inputs_resp_elem:
   - read:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}/_input
       method: GET
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input
+      method: GET
 
 workflow_input_data:
   - update:
@@ -83,6 +114,9 @@ workflow_input_data:
       method: PUT
   - update:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}/_input
+      method: PUT
+  - update:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input
       method: PUT
 
 com.nokia.eda.routing.v1alpha1.attachment_lookup:
@@ -198,6 +232,22 @@ com.nokia.eda.routing.v1alpha1.route_lookup_list:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/routelookups
       method: GET
 
+com.nokia.eda.routing.v1alpha1.route_trace:
+  - create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces
+      method: POST
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}
+      method: GET
+
+com.nokia.eda.routing.v1alpha1.route_trace_list:
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces
+      method: GET
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/routetraces
+      method: GET
+
 com.nokia.eda.routing.v1alpha1.system_interface:
   - create:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces
@@ -225,42 +275,73 @@ com.nokia.eda.routing.v1alpha1.system_interface_deleted_resources:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/_deleted
       method: GET
 
-totalPaths: 41
-totalSchemas: 59
-usedSchemas: 25
-unusedSchemas: 34
+totalPaths: 55
+totalSchemas: 94
+usedSchemas: 29
+unusedSchemas: 65
 unusedSchemaList:
   - AppGroupVersion
   - ErrorIndex
   - ErrorItem
   - ErrorResponse
+  - IntentTarget
   - K8SPatchOp
   - OverlayState
   - Resource
   - ResourceHistoryEntry
   - StatusDetails
   - TopoAttrMetadata
+  - TopoAttribute
+  - TopoBoolExpression
+  - TopoBoolLiteral
   - TopoElemMetadata
-  - TopoLinkEndpoint
+  - TopoEndpointBoolExpression
+  - TopoField
+  - TopoFixedBoolExpression
+  - TopoLabelSelector
+  - TopoLiteralStatusOrBadge
+  - TopoLiteralValue
+  - TopoLogicalExpression
   - TopoNodeGrouping
   - TopoOverlayEndpoint
   - TopoOverlayEndpointState
   - TopoOverlayLink
+  - TopoOverlayLinkGroup
+  - TopoOverlayLinkGroupEndpoint
   - TopoOverlayLinkState
   - TopoOverlayNode
+  - TopoOverlayNodeOrGroup
   - TopoOverlayNodeState
+  - TopoOverlayValue
   - TopoSchema
+  - TopoStateFilter
+  - TopoValue
+  - TopoValueExpression
   - Topology
-  - WorkflowId
   - WorkflowIdentifier
   - WorkflowInputDataElem
+  - com.nokia.eda.routing.v1alpha1.AttachmentLookup_alarms
+  - com.nokia.eda.routing.v1alpha1.AttachmentLookup_deviations
   - com.nokia.eda.routing.v1alpha1.AttachmentLookup_metadata
   - com.nokia.eda.routing.v1alpha1.DefaultInterface_DeletedResourceEntry
+  - com.nokia.eda.routing.v1alpha1.DefaultInterface_alarms
+  - com.nokia.eda.routing.v1alpha1.DefaultInterface_deviations
   - com.nokia.eda.routing.v1alpha1.DefaultInterface_metadata
   - com.nokia.eda.routing.v1alpha1.DefaultRouter_DeletedResourceEntry
+  - com.nokia.eda.routing.v1alpha1.DefaultRouter_alarms
+  - com.nokia.eda.routing.v1alpha1.DefaultRouter_deviations
   - com.nokia.eda.routing.v1alpha1.DefaultRouter_metadata
   - com.nokia.eda.routing.v1alpha1.Drain_DeletedResourceEntry
+  - com.nokia.eda.routing.v1alpha1.Drain_alarms
+  - com.nokia.eda.routing.v1alpha1.Drain_deviations
   - com.nokia.eda.routing.v1alpha1.Drain_metadata
+  - com.nokia.eda.routing.v1alpha1.RouteLookup_alarms
+  - com.nokia.eda.routing.v1alpha1.RouteLookup_deviations
   - com.nokia.eda.routing.v1alpha1.RouteLookup_metadata
+  - com.nokia.eda.routing.v1alpha1.RouteTrace_alarms
+  - com.nokia.eda.routing.v1alpha1.RouteTrace_deviations
+  - com.nokia.eda.routing.v1alpha1.RouteTrace_metadata
   - com.nokia.eda.routing.v1alpha1.SystemInterface_DeletedResourceEntry
+  - com.nokia.eda.routing.v1alpha1.SystemInterface_alarms
+  - com.nokia.eda.routing.v1alpha1.SystemInterface_deviations
   - com.nokia.eda.routing.v1alpha1.SystemInterface_metadata

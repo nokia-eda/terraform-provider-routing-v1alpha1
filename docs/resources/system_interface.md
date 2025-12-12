@@ -22,7 +22,9 @@ description: |-
 
 ### Optional
 
+- `alarms` (Attributes) (see [below for nested schema](#nestedatt--alarms))
 - `api_version` (String)
+- `deviations` (Attributes) (see [below for nested schema](#nestedatt--deviations))
 - `kind` (String)
 - `name` (String) name of the SystemInterface
 - `namespace` (String) the namespace scope in which to operate
@@ -66,8 +68,27 @@ Optional:
 - `enabled` (Boolean) Enable Biforward Detection[default=false].
 - `min_echo_receive_interval` (Number) The minimum interval between echo packets the local node can receive in microseconds
 - `required_min_receive` (Number) The minimum interval in microseconds between received BFD control packets that this system should support.[default=1000000].
-- `ttl` (Number) Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.
+- `ttl` (Number) Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not applicable to single-hop BFD sessions.
 
+
+
+<a id="nestedatt--alarms"></a>
+### Nested Schema for `alarms`
+
+Optional:
+
+- `critical` (Number)
+- `major` (Number)
+- `minor` (Number)
+- `warning` (Number)
+
+
+<a id="nestedatt--deviations"></a>
+### Nested Schema for `deviations`
+
+Optional:
+
+- `count` (Number)
 
 
 <a id="nestedatt--status"></a>

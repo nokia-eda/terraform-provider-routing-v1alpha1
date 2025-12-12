@@ -25,6 +25,33 @@ import (
 func DefaultInterfaceResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"alarms": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"critical": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+					},
+					"major": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+					},
+					"minor": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+					},
+					"warning": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+					},
+				},
+				CustomType: AlarmsType{
+					ObjectType: types.ObjectType{
+						AttrTypes: AlarmsValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional: true,
+				Computed: true,
+			},
 			"api_version": schema.StringAttribute{
 				Optional: true,
 				Computed: true,
@@ -32,6 +59,21 @@ func DefaultInterfaceResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.RegexMatches(regexp.MustCompile("^routing\\.eda\\.nokia\\.com/v1alpha1$"), ""),
 				},
 				Default: stringdefault.StaticString("routing.eda.nokia.com/v1alpha1"),
+			},
+			"deviations": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"count": schema.Int64Attribute{
+						Optional: true,
+						Computed: true,
+					},
+				},
+				CustomType: DeviationsType{
+					ObjectType: types.ObjectType{
+						AttrTypes: DeviationsValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional: true,
+				Computed: true,
 			},
 			"kind": schema.StringAttribute{
 				Optional: true,
@@ -136,8 +178,8 @@ func DefaultInterfaceResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"ttl": schema.Int64Attribute{
 								Optional:            true,
-								Description:         "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.",
-								MarkdownDescription: "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.",
+								Description:         "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not applicable to single-hop BFD sessions.",
+								MarkdownDescription: "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not applicable to single-hop BFD sessions.",
 								Validators: []validator.Int64{
 									int64validator.Between(2, 255),
 								},
@@ -223,6 +265,11 @@ func DefaultInterfaceResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "List of IPv6 addresses in ip/mask form, e.g., fc00::1/120.",
 						MarkdownDescription: "List of IPv6 addresses in ip/mask form, e.g., fc00::1/120.",
 					},
+					"subinterface_index": schema.Int64Attribute{
+						Optional:            true,
+						Description:         "Subinterface index to use with this DefaultInterface. Ignored for platforms that do not support subinterface index",
+						MarkdownDescription: "Subinterface index to use with this DefaultInterface. Ignored for platforms that do not support subinterface index",
+					},
 					"unnumbered": schema.StringAttribute{
 						Optional:            true,
 						Description:         "Enables the use of unnumbered interfaces on the ISL. For IPv6, no IP address are configured on the sub-interface and only the link local address will be used. If any allocation pool is specified for IPv6 that will take precedence and IPs will be assigned to the interfaces.  When using eBGP for an underlay protocol, the DefaultInterfaces which are a part of the ISL will be added to the BGP dynamic neighbor list.",
@@ -293,13 +340,828 @@ func DefaultInterfaceResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type DefaultInterfaceModel struct {
-	ApiVersion types.String  `tfsdk:"api_version"`
-	Kind       types.String  `tfsdk:"kind"`
-	Metadata   MetadataValue `tfsdk:"metadata"`
-	Name       types.String  `tfsdk:"name"`
-	Namespace  types.String  `tfsdk:"namespace"`
-	Spec       SpecValue     `tfsdk:"spec"`
-	Status     StatusValue   `tfsdk:"status"`
+	Alarms     AlarmsValue     `tfsdk:"alarms"`
+	ApiVersion types.String    `tfsdk:"api_version"`
+	Deviations DeviationsValue `tfsdk:"deviations"`
+	Kind       types.String    `tfsdk:"kind"`
+	Metadata   MetadataValue   `tfsdk:"metadata"`
+	Name       types.String    `tfsdk:"name"`
+	Namespace  types.String    `tfsdk:"namespace"`
+	Spec       SpecValue       `tfsdk:"spec"`
+	Status     StatusValue     `tfsdk:"status"`
+}
+
+var _ basetypes.ObjectTypable = AlarmsType{}
+
+type AlarmsType struct {
+	basetypes.ObjectType
+}
+
+func (t AlarmsType) Equal(o attr.Type) bool {
+	other, ok := o.(AlarmsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t AlarmsType) String() string {
+	return "AlarmsType"
+}
+
+func (t AlarmsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	criticalAttribute, ok := attributes["critical"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`critical is missing from object`)
+
+		return nil, diags
+	}
+
+	criticalVal, ok := criticalAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`critical expected to be basetypes.Int64Value, was: %T`, criticalAttribute))
+	}
+
+	majorAttribute, ok := attributes["major"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`major is missing from object`)
+
+		return nil, diags
+	}
+
+	majorVal, ok := majorAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`major expected to be basetypes.Int64Value, was: %T`, majorAttribute))
+	}
+
+	minorAttribute, ok := attributes["minor"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`minor is missing from object`)
+
+		return nil, diags
+	}
+
+	minorVal, ok := minorAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`minor expected to be basetypes.Int64Value, was: %T`, minorAttribute))
+	}
+
+	warningAttribute, ok := attributes["warning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`warning is missing from object`)
+
+		return nil, diags
+	}
+
+	warningVal, ok := warningAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`warning expected to be basetypes.Int64Value, was: %T`, warningAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return AlarmsValue{
+		Critical: criticalVal,
+		Major:    majorVal,
+		Minor:    minorVal,
+		Warning:  warningVal,
+		state:    attr.ValueStateKnown,
+	}, diags
+}
+
+func NewAlarmsValueNull() AlarmsValue {
+	return AlarmsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewAlarmsValueUnknown() AlarmsValue {
+	return AlarmsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewAlarmsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (AlarmsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing AlarmsValue Attribute Value",
+				"While creating a AlarmsValue value, a missing attribute value was detected. "+
+					"A AlarmsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("AlarmsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid AlarmsValue Attribute Type",
+				"While creating a AlarmsValue value, an invalid attribute value was detected. "+
+					"A AlarmsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("AlarmsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("AlarmsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra AlarmsValue Attribute Value",
+				"While creating a AlarmsValue value, an extra attribute value was detected. "+
+					"A AlarmsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra AlarmsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	criticalAttribute, ok := attributes["critical"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`critical is missing from object`)
+
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	criticalVal, ok := criticalAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`critical expected to be basetypes.Int64Value, was: %T`, criticalAttribute))
+	}
+
+	majorAttribute, ok := attributes["major"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`major is missing from object`)
+
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	majorVal, ok := majorAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`major expected to be basetypes.Int64Value, was: %T`, majorAttribute))
+	}
+
+	minorAttribute, ok := attributes["minor"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`minor is missing from object`)
+
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	minorVal, ok := minorAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`minor expected to be basetypes.Int64Value, was: %T`, minorAttribute))
+	}
+
+	warningAttribute, ok := attributes["warning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`warning is missing from object`)
+
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	warningVal, ok := warningAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`warning expected to be basetypes.Int64Value, was: %T`, warningAttribute))
+	}
+
+	if diags.HasError() {
+		return NewAlarmsValueUnknown(), diags
+	}
+
+	return AlarmsValue{
+		Critical: criticalVal,
+		Major:    majorVal,
+		Minor:    minorVal,
+		Warning:  warningVal,
+		state:    attr.ValueStateKnown,
+	}, diags
+}
+
+func NewAlarmsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) AlarmsValue {
+	object, diags := NewAlarmsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewAlarmsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t AlarmsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewAlarmsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewAlarmsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewAlarmsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewAlarmsValueMust(AlarmsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t AlarmsType) ValueType(ctx context.Context) attr.Value {
+	return AlarmsValue{}
+}
+
+var _ basetypes.ObjectValuable = AlarmsValue{}
+
+type AlarmsValue struct {
+	Critical basetypes.Int64Value `tfsdk:"critical"`
+	Major    basetypes.Int64Value `tfsdk:"major"`
+	Minor    basetypes.Int64Value `tfsdk:"minor"`
+	Warning  basetypes.Int64Value `tfsdk:"warning"`
+	state    attr.ValueState
+}
+
+func (v AlarmsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 4)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["critical"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["major"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["minor"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["warning"] = basetypes.Int64Type{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 4)
+
+		val, err = v.Critical.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["critical"] = val
+
+		val, err = v.Major.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["major"] = val
+
+		val, err = v.Minor.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["minor"] = val
+
+		val, err = v.Warning.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["warning"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v AlarmsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v AlarmsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v AlarmsValue) String() string {
+	return "AlarmsValue"
+}
+
+func (v AlarmsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"critical": basetypes.Int64Type{},
+		"major":    basetypes.Int64Type{},
+		"minor":    basetypes.Int64Type{},
+		"warning":  basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"critical": v.Critical,
+			"major":    v.Major,
+			"minor":    v.Minor,
+			"warning":  v.Warning,
+		})
+
+	return objVal, diags
+}
+
+func (v AlarmsValue) Equal(o attr.Value) bool {
+	other, ok := o.(AlarmsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Critical.Equal(other.Critical) {
+		return false
+	}
+
+	if !v.Major.Equal(other.Major) {
+		return false
+	}
+
+	if !v.Minor.Equal(other.Minor) {
+		return false
+	}
+
+	if !v.Warning.Equal(other.Warning) {
+		return false
+	}
+
+	return true
+}
+
+func (v AlarmsValue) Type(ctx context.Context) attr.Type {
+	return AlarmsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v AlarmsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"critical": basetypes.Int64Type{},
+		"major":    basetypes.Int64Type{},
+		"minor":    basetypes.Int64Type{},
+		"warning":  basetypes.Int64Type{},
+	}
+}
+
+var _ basetypes.ObjectTypable = DeviationsType{}
+
+type DeviationsType struct {
+	basetypes.ObjectType
+}
+
+func (t DeviationsType) Equal(o attr.Type) bool {
+	other, ok := o.(DeviationsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t DeviationsType) String() string {
+	return "DeviationsType"
+}
+
+func (t DeviationsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	countAttribute, ok := attributes["count"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`count is missing from object`)
+
+		return nil, diags
+	}
+
+	countVal, ok := countAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`count expected to be basetypes.Int64Value, was: %T`, countAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return DeviationsValue{
+		Count: countVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewDeviationsValueNull() DeviationsValue {
+	return DeviationsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewDeviationsValueUnknown() DeviationsValue {
+	return DeviationsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewDeviationsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (DeviationsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing DeviationsValue Attribute Value",
+				"While creating a DeviationsValue value, a missing attribute value was detected. "+
+					"A DeviationsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("DeviationsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid DeviationsValue Attribute Type",
+				"While creating a DeviationsValue value, an invalid attribute value was detected. "+
+					"A DeviationsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("DeviationsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("DeviationsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra DeviationsValue Attribute Value",
+				"While creating a DeviationsValue value, an extra attribute value was detected. "+
+					"A DeviationsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra DeviationsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewDeviationsValueUnknown(), diags
+	}
+
+	countAttribute, ok := attributes["count"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`count is missing from object`)
+
+		return NewDeviationsValueUnknown(), diags
+	}
+
+	countVal, ok := countAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`count expected to be basetypes.Int64Value, was: %T`, countAttribute))
+	}
+
+	if diags.HasError() {
+		return NewDeviationsValueUnknown(), diags
+	}
+
+	return DeviationsValue{
+		Count: countVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewDeviationsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) DeviationsValue {
+	object, diags := NewDeviationsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewDeviationsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t DeviationsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewDeviationsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewDeviationsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewDeviationsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewDeviationsValueMust(DeviationsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t DeviationsType) ValueType(ctx context.Context) attr.Value {
+	return DeviationsValue{}
+}
+
+var _ basetypes.ObjectValuable = DeviationsValue{}
+
+type DeviationsValue struct {
+	Count basetypes.Int64Value `tfsdk:"count"`
+	state attr.ValueState
+}
+
+func (v DeviationsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 1)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["count"] = basetypes.Int64Type{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 1)
+
+		val, err = v.Count.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["count"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v DeviationsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v DeviationsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v DeviationsValue) String() string {
+	return "DeviationsValue"
+}
+
+func (v DeviationsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"count": basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"count": v.Count,
+		})
+
+	return objVal, diags
+}
+
+func (v DeviationsValue) Equal(o attr.Value) bool {
+	other, ok := o.(DeviationsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Count.Equal(other.Count) {
+		return false
+	}
+
+	return true
+}
+
+func (v DeviationsValue) Type(ctx context.Context) attr.Type {
+	return DeviationsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v DeviationsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"count": basetypes.Int64Type{},
+	}
 }
 
 var _ basetypes.ObjectTypable = MetadataType{}
@@ -1004,6 +1866,24 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 			fmt.Sprintf(`ipv6_addresses expected to be basetypes.ListValue, was: %T`, ipv6AddressesAttribute))
 	}
 
+	subinterfaceIndexAttribute, ok := attributes["subinterface_index"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`subinterface_index is missing from object`)
+
+		return nil, diags
+	}
+
+	subinterfaceIndexVal, ok := subinterfaceIndexAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`subinterface_index expected to be basetypes.Int64Value, was: %T`, subinterfaceIndexAttribute))
+	}
+
 	unnumberedAttribute, ok := attributes["unnumbered"]
 
 	if !ok {
@@ -1045,16 +1925,17 @@ func (t SpecType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 	}
 
 	return SpecValue{
-		Bfd:           bfdVal,
-		DefaultRouter: defaultRouterVal,
-		Description:   descriptionVal,
-		Interface:     interfaceVal,
-		IpMtu:         ipMtuVal,
-		Ipv4Addresses: ipv4AddressesVal,
-		Ipv6Addresses: ipv6AddressesVal,
-		Unnumbered:    unnumberedVal,
-		VlanId:        vlanIdVal,
-		state:         attr.ValueStateKnown,
+		Bfd:               bfdVal,
+		DefaultRouter:     defaultRouterVal,
+		Description:       descriptionVal,
+		Interface:         interfaceVal,
+		IpMtu:             ipMtuVal,
+		Ipv4Addresses:     ipv4AddressesVal,
+		Ipv6Addresses:     ipv6AddressesVal,
+		SubinterfaceIndex: subinterfaceIndexVal,
+		Unnumbered:        unnumberedVal,
+		VlanId:            vlanIdVal,
+		state:             attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1247,6 +2128,24 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 			fmt.Sprintf(`ipv6_addresses expected to be basetypes.ListValue, was: %T`, ipv6AddressesAttribute))
 	}
 
+	subinterfaceIndexAttribute, ok := attributes["subinterface_index"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`subinterface_index is missing from object`)
+
+		return NewSpecValueUnknown(), diags
+	}
+
+	subinterfaceIndexVal, ok := subinterfaceIndexAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`subinterface_index expected to be basetypes.Int64Value, was: %T`, subinterfaceIndexAttribute))
+	}
+
 	unnumberedAttribute, ok := attributes["unnumbered"]
 
 	if !ok {
@@ -1288,16 +2187,17 @@ func NewSpecValue(attributeTypes map[string]attr.Type, attributes map[string]att
 	}
 
 	return SpecValue{
-		Bfd:           bfdVal,
-		DefaultRouter: defaultRouterVal,
-		Description:   descriptionVal,
-		Interface:     interfaceVal,
-		IpMtu:         ipMtuVal,
-		Ipv4Addresses: ipv4AddressesVal,
-		Ipv6Addresses: ipv6AddressesVal,
-		Unnumbered:    unnumberedVal,
-		VlanId:        vlanIdVal,
-		state:         attr.ValueStateKnown,
+		Bfd:               bfdVal,
+		DefaultRouter:     defaultRouterVal,
+		Description:       descriptionVal,
+		Interface:         interfaceVal,
+		IpMtu:             ipMtuVal,
+		Ipv4Addresses:     ipv4AddressesVal,
+		Ipv6Addresses:     ipv6AddressesVal,
+		SubinterfaceIndex: subinterfaceIndexVal,
+		Unnumbered:        unnumberedVal,
+		VlanId:            vlanIdVal,
+		state:             attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1369,20 +2269,21 @@ func (t SpecType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = SpecValue{}
 
 type SpecValue struct {
-	Bfd           basetypes.ObjectValue `tfsdk:"bfd"`
-	DefaultRouter basetypes.StringValue `tfsdk:"default_router"`
-	Description   basetypes.StringValue `tfsdk:"description"`
-	Interface     basetypes.StringValue `tfsdk:"interface"`
-	IpMtu         basetypes.Int64Value  `tfsdk:"ip_mtu"`
-	Ipv4Addresses basetypes.ListValue   `tfsdk:"ipv4_addresses"`
-	Ipv6Addresses basetypes.ListValue   `tfsdk:"ipv6_addresses"`
-	Unnumbered    basetypes.StringValue `tfsdk:"unnumbered"`
-	VlanId        basetypes.Int64Value  `tfsdk:"vlan_id"`
-	state         attr.ValueState
+	Bfd               basetypes.ObjectValue `tfsdk:"bfd"`
+	DefaultRouter     basetypes.StringValue `tfsdk:"default_router"`
+	Description       basetypes.StringValue `tfsdk:"description"`
+	Interface         basetypes.StringValue `tfsdk:"interface"`
+	IpMtu             basetypes.Int64Value  `tfsdk:"ip_mtu"`
+	Ipv4Addresses     basetypes.ListValue   `tfsdk:"ipv4_addresses"`
+	Ipv6Addresses     basetypes.ListValue   `tfsdk:"ipv6_addresses"`
+	SubinterfaceIndex basetypes.Int64Value  `tfsdk:"subinterface_index"`
+	Unnumbered        basetypes.StringValue `tfsdk:"unnumbered"`
+	VlanId            basetypes.Int64Value  `tfsdk:"vlan_id"`
+	state             attr.ValueState
 }
 
 func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 9)
+	attrTypes := make(map[string]tftypes.Type, 10)
 
 	var val tftypes.Value
 	var err error
@@ -1400,6 +2301,7 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	attrTypes["ipv6_addresses"] = basetypes.ListType{
 		ElemType: Ipv6AddressesValue{}.Type(ctx),
 	}.TerraformType(ctx)
+	attrTypes["subinterface_index"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["unnumbered"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vlan_id"] = basetypes.Int64Type{}.TerraformType(ctx)
 
@@ -1407,7 +2309,7 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 9)
+		vals := make(map[string]tftypes.Value, 10)
 
 		val, err = v.Bfd.ToTerraformValue(ctx)
 
@@ -1464,6 +2366,14 @@ func (v SpecValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		}
 
 		vals["ipv6_addresses"] = val
+
+		val, err = v.SubinterfaceIndex.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["subinterface_index"] = val
 
 		val, err = v.Unnumbered.ToTerraformValue(ctx)
 
@@ -1603,8 +2513,9 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		"ipv6_addresses": basetypes.ListType{
 			ElemType: Ipv6AddressesValue{}.Type(ctx),
 		},
-		"unnumbered": basetypes.StringType{},
-		"vlan_id":    basetypes.Int64Type{},
+		"subinterface_index": basetypes.Int64Type{},
+		"unnumbered":         basetypes.StringType{},
+		"vlan_id":            basetypes.Int64Type{},
 	}
 
 	if v.IsNull() {
@@ -1618,15 +2529,16 @@ func (v SpecValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"bfd":            bfd,
-			"default_router": v.DefaultRouter,
-			"description":    v.Description,
-			"interface":      v.Interface,
-			"ip_mtu":         v.IpMtu,
-			"ipv4_addresses": ipv4Addresses,
-			"ipv6_addresses": ipv6Addresses,
-			"unnumbered":     v.Unnumbered,
-			"vlan_id":        v.VlanId,
+			"bfd":                bfd,
+			"default_router":     v.DefaultRouter,
+			"description":        v.Description,
+			"interface":          v.Interface,
+			"ip_mtu":             v.IpMtu,
+			"ipv4_addresses":     ipv4Addresses,
+			"ipv6_addresses":     ipv6Addresses,
+			"subinterface_index": v.SubinterfaceIndex,
+			"unnumbered":         v.Unnumbered,
+			"vlan_id":            v.VlanId,
 		})
 
 	return objVal, diags
@@ -1675,6 +2587,10 @@ func (v SpecValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.SubinterfaceIndex.Equal(other.SubinterfaceIndex) {
+		return false
+	}
+
 	if !v.Unnumbered.Equal(other.Unnumbered) {
 		return false
 	}
@@ -1709,8 +2625,9 @@ func (v SpecValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"ipv6_addresses": basetypes.ListType{
 			ElemType: Ipv6AddressesValue{}.Type(ctx),
 		},
-		"unnumbered": basetypes.StringType{},
-		"vlan_id":    basetypes.Int64Type{},
+		"subinterface_index": basetypes.Int64Type{},
+		"unnumbered":         basetypes.StringType{},
+		"vlan_id":            basetypes.Int64Type{},
 	}
 }
 

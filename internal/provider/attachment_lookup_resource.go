@@ -11,41 +11,40 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/nokia/eda/apps/terraform-provider-routing/internal/eda/apiclient"
-	"github.com/nokia/eda/apps/terraform-provider-routing/internal/resource_default_router"
+	"github.com/nokia/eda/apps/terraform-provider-routing/internal/resource_attachment_lookup"
 	"github.com/nokia/eda/apps/terraform-provider-routing/internal/tfutils"
 )
 
 const (
-	create_rs_defaultRouter = "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters"
-	read_rs_defaultRouter   = "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}"
-	update_rs_defaultRouter = "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}"
-	delete_rs_defaultRouter = "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}"
+	create_rs_attachmentLookup = "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups"
+	read_rs_attachmentLookup   = "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}"
+	delete_rs_attachmentLookup = "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}"
 )
 
 var (
-	_ resource.Resource                = (*defaultRouterResource)(nil)
-	_ resource.ResourceWithConfigure   = (*defaultRouterResource)(nil)
-	_ resource.ResourceWithImportState = (*defaultRouterResource)(nil)
+	_ resource.Resource                = (*attachmentLookupResource)(nil)
+	_ resource.ResourceWithConfigure   = (*attachmentLookupResource)(nil)
+	_ resource.ResourceWithImportState = (*attachmentLookupResource)(nil)
 )
 
-func NewDefaultRouterResource() resource.Resource {
-	return &defaultRouterResource{}
+func NewAttachmentLookupResource() resource.Resource {
+	return &attachmentLookupResource{}
 }
 
-type defaultRouterResource struct {
+type attachmentLookupResource struct {
 	client *apiclient.EdaApiClient
 }
 
-func (r *defaultRouterResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_default_router"
+func (r *attachmentLookupResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_attachment_lookup"
 }
 
-func (r *defaultRouterResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = resource_default_router.DefaultRouterResourceSchema(ctx)
+func (r *attachmentLookupResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = resource_attachment_lookup.AttachmentLookupResourceSchema(ctx)
 }
 
-func (r *defaultRouterResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var data resource_default_router.DefaultRouterModel
+func (r *attachmentLookupResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var data resource_attachment_lookup.AttachmentLookupModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
@@ -70,19 +69,19 @@ func (r *defaultRouterResource) Create(ctx context.Context, req resource.CreateR
 
 	// Create API call logic
 	tflog.Info(ctx, "Create()::API request", map[string]any{
-		"path": create_rs_defaultRouter,
+		"path": create_rs_attachmentLookup,
 		"body": spew.Sdump(reqBody),
 	})
 
 	t0 := time.Now()
 	result := map[string]any{}
 
-	err = r.client.Create(ctx, create_rs_defaultRouter, map[string]string{
+	err = r.client.Create(ctx, create_rs_attachmentLookup, map[string]string{
 		"namespace": tfutils.StringValue(data.Metadata.Namespace),
 	}, reqBody, &result)
 
 	tflog.Info(ctx, "Create()::API returned", map[string]any{
-		"path":      create_rs_defaultRouter,
+		"path":      create_rs_attachmentLookup,
 		"result":    spew.Sdump(result),
 		"timeTaken": time.Since(t0).String(),
 	})
@@ -95,13 +94,13 @@ func (r *defaultRouterResource) Create(ctx context.Context, req resource.CreateR
 	// Read the resource again to populate any values not available in the response from Create()
 	t0 = time.Now()
 
-	err = r.client.Get(ctx, read_rs_defaultRouter, map[string]string{
+	err = r.client.Get(ctx, read_rs_attachmentLookup, map[string]string{
 		"namespace": tfutils.StringValue(data.Metadata.Namespace),
 		"name":      tfutils.StringValue(data.Metadata.Name),
 	}, &result)
 
 	tflog.Info(ctx, "Read()::API returned", map[string]any{
-		"path":      read_rs_defaultRouter,
+		"path":      read_rs_attachmentLookup,
 		"result":    spew.Sdump(result),
 		"timeTaken": time.Since(t0).String(),
 	})
@@ -121,8 +120,8 @@ func (r *defaultRouterResource) Create(ctx context.Context, req resource.CreateR
 	resp.Diagnostics.Append(resp.State.Set(ctx, data)...)
 }
 
-func (r *defaultRouterResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data resource_default_router.DefaultRouterModel
+func (r *attachmentLookupResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data resource_attachment_lookup.AttachmentLookupModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
@@ -133,20 +132,20 @@ func (r *defaultRouterResource) Read(ctx context.Context, req resource.ReadReque
 
 	// Read API call logic
 	tflog.Info(ctx, "Read()::API request", map[string]any{
-		"path": read_rs_defaultRouter,
+		"path": read_rs_attachmentLookup,
 		"data": spew.Sdump(data),
 	})
 
 	t0 := time.Now()
 	result := map[string]any{}
 
-	err := r.client.Get(ctx, read_rs_defaultRouter, map[string]string{
+	err := r.client.Get(ctx, read_rs_attachmentLookup, map[string]string{
 		"namespace": tfutils.StringValue(data.Metadata.Namespace),
 		"name":      tfutils.StringValue(data.Metadata.Name),
 	}, &result)
 
 	tflog.Info(ctx, "Read()::API returned", map[string]any{
-		"path":      read_rs_defaultRouter,
+		"path":      read_rs_attachmentLookup,
 		"result":    spew.Sdump(result),
 		"timeTaken": time.Since(t0).String(),
 	})
@@ -167,85 +166,13 @@ func (r *defaultRouterResource) Read(ctx context.Context, req resource.ReadReque
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *defaultRouterResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data resource_default_router.DefaultRouterModel
-
-	// Read Terraform plan data into the model
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	err := tfutils.FillMissingValues(ctx, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("Error filling missing values", err.Error())
-		return
-	}
-
-	reqBody, err := tfutils.ModelToAnyMap(ctx, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("Error building request", err.Error())
-		return
-	}
-
-	// Update API call logic
-	tflog.Info(ctx, "Update()::API request", map[string]any{
-		"path": update_rs_defaultRouter,
-		"body": spew.Sdump(reqBody),
-	})
-
-	t0 := time.Now()
-	result := map[string]any{}
-
-	err = r.client.Update(ctx, update_rs_defaultRouter, map[string]string{
-		"namespace": tfutils.StringValue(data.Metadata.Namespace),
-		"name":      tfutils.StringValue(data.Metadata.Name),
-	}, reqBody, &result)
-
-	tflog.Info(ctx, "Update()::API returned", map[string]any{
-		"path":      update_rs_defaultRouter,
-		"result":    spew.Sdump(result),
-		"timeTaken": time.Since(t0).String(),
-	})
-
-	if err != nil {
-		resp.Diagnostics.AddError("Error updating resource", err.Error())
-		return
-	}
-
-	// Read the resource again to populate any values not available in the response from Update()
-	t0 = time.Now()
-
-	err = r.client.Get(ctx, read_rs_defaultRouter, map[string]string{
-		"namespace": tfutils.StringValue(data.Metadata.Namespace),
-		"name":      tfutils.StringValue(data.Metadata.Name),
-	}, &result)
-
-	tflog.Info(ctx, "Read()::API returned", map[string]any{
-		"path":      read_rs_defaultRouter,
-		"result":    spew.Sdump(result),
-		"timeTaken": time.Since(t0).String(),
-	})
-
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading resource", err.Error())
-		return
-	}
-
-	// Convert API response to Terraform model
-	err = tfutils.AnyMapToModel(ctx, result, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("Failed to build response from API result", err.Error())
-		return
-	}
-
-	// Save updated data into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+func (r *attachmentLookupResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	// Update not supported for this resource
+	resp.Diagnostics.AddError("Update not supported", "This resource does not support update operation.")
 }
 
-func (r *defaultRouterResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data resource_default_router.DefaultRouterModel
+func (r *attachmentLookupResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var data resource_attachment_lookup.AttachmentLookupModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
@@ -256,20 +183,20 @@ func (r *defaultRouterResource) Delete(ctx context.Context, req resource.DeleteR
 
 	// Delete API call logic
 	tflog.Info(ctx, "Delete()::API request", map[string]any{
-		"path": delete_rs_defaultRouter,
+		"path": delete_rs_attachmentLookup,
 		"data": spew.Sdump(data),
 	})
 
 	t0 := time.Now()
 	result := map[string]any{}
 
-	err := r.client.Delete(ctx, delete_rs_defaultRouter, map[string]string{
+	err := r.client.Delete(ctx, delete_rs_attachmentLookup, map[string]string{
 		"namespace": tfutils.StringValue(data.Metadata.Namespace),
 		"name":      tfutils.StringValue(data.Metadata.Name),
 	}, &result)
 
 	tflog.Info(ctx, "Delete()::API returned", map[string]any{
-		"path":      delete_rs_defaultRouter,
+		"path":      delete_rs_attachmentLookup,
 		"result":    spew.Sdump(result),
 		"timeTaken": time.Since(t0).String(),
 	})
@@ -281,7 +208,7 @@ func (r *defaultRouterResource) Delete(ctx context.Context, req resource.DeleteR
 }
 
 // Configure adds the provider configured client to the resource.
-func (r *defaultRouterResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *attachmentLookupResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Add a nil check when handling ProviderData because Terraform
 	// sets that data after it calls the ConfigureProvider RPC.
 	if req.ProviderData == nil {
@@ -301,7 +228,7 @@ func (r *defaultRouterResource) Configure(_ context.Context, req resource.Config
 }
 
 // ImportState implements resource.ResourceWithImportState.
-func (r *defaultRouterResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *attachmentLookupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	parts := strings.Split(req.ID, "/")
 	if len(parts) < 2 {
 		resp.Diagnostics.AddError("Invalid ID", fmt.Sprintf("Expected format: id = <namespace/name>, got: id = %s", req.ID))

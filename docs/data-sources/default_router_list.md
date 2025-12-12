@@ -24,6 +24,7 @@ description: |-
 - `fields` (String) a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.
 - `filter` (String) an EQL "where" expression that will be used to filter the set of resources returned.
 - `label_selector` (String) a label selector string to filter the results based on CR labels
+- `labelselector` (String) Deprecated: a label selector string to filter the results based on CR labels
 
 ### Read-Only
 
@@ -40,7 +41,9 @@ Optional:
 
 Read-Only:
 
+- `alarms` (Attributes) (see [below for nested schema](#nestedatt--items--alarms))
 - `api_version` (String)
+- `deviations` (Attributes) (see [below for nested schema](#nestedatt--items--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--items--metadata))
 - `status` (Attributes) DefaultRouterStatus defines the observed state of DefaultRouter (see [below for nested schema](#nestedatt--items--status))
@@ -52,6 +55,7 @@ Optional:
 
 - `bgp` (Attributes) BGP configuration. (see [below for nested schema](#nestedatt--items--spec--bgp))
 - `description` (String) Sets the description on the Default router.
+- `ecmp` (Number) Set the maximum number of ECMP paths for the DefaultRouter. This is supported only by some platforms, and will be ignored for others.
 - `export_policy` (List of String) Reference to a Policy resource to use when evaluating route exports from the DefaultRouter.
 - `import_policy` (List of String) Reference to a Policy resource to use when evaluating route imports into the DefaultRouter.
 - `node` (String) Reference to a TopoNode on which to configure the default routing instance.
@@ -147,6 +151,25 @@ Optional:
 - `export_policy` (String) Reference to a Policy resource to use when evaluating route exports from the DefaultRouter.
 - `import_policy` (String) Reference to a Policy resource to use when evaluating route imports into the DefaultRouter.
 
+
+
+<a id="nestedatt--items--alarms"></a>
+### Nested Schema for `items.alarms`
+
+Read-Only:
+
+- `critical` (Number)
+- `major` (Number)
+- `minor` (Number)
+- `warning` (Number)
+
+
+<a id="nestedatt--items--deviations"></a>
+### Nested Schema for `items.deviations`
+
+Read-Only:
+
+- `count` (Number)
 
 
 <a id="nestedatt--items--metadata"></a>

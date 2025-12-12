@@ -57,28 +57,56 @@
         "type": "object"
       },
       "ErrorResponse": {
-        "description": "Generic error response for REST APIs",
         "properties": {
+          "causeCollection": {
+            "description": "A lower-level set of structured errors.\n\nOnly oneOf `causeWrapped`, `causeSimple`, `causeCollection`, or `causeIndexedCollection` will ever be set.",
+            "items": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "type": "array"
+          },
+          "causeIndexedCollection": {
+            "description": "A lower-level set of structured errors.\nEach of these errors MUST have index set.\n\nOnly oneOf `causeWrapped`, `causeSimple`, `causeCollection`, or `causeIndexedCollection` will ever be set.",
+            "items": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "type": "array"
+          },
+          "causeIsInternal": {
+            "description": "If true, then the cause (`causeWrapped`, `causeSimple`, `causeCollection`, or `causeIndexedCollection`) should be hidden from the user.",
+            "type": "boolean"
+          },
+          "causeSimple": {
+            "description": "Simple string error type.\n\nOnly oneOf `causeWrapped`, `causeSimple`, `causeCollection`, or `causeIndexedCollection` will ever be set.",
+            "type": "string"
+          },
+          "causeWrapped": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
           "code": {
-            "description": "the numeric HTTP error code for the response.",
+            "deprecated": true,
+            "description": "the numeric HTTP error code for the response.\n\nDeprecated: Prefer to check the request's HTTP response code directly.",
             "format": "int64",
             "type": "integer"
           },
           "details": {
-            "description": "The optional details of the error response.",
+            "deprecated": true,
+            "description": "The optional details of the error response.\nDeprecated: Replaced by `causeSimple`.",
             "type": "string"
           },
           "dictionary": {
             "additionalProperties": true,
-            "description": "Dictionary/map of associated data/information relevant to the error.\nThe error \"message\" may contain {{name}} escapes that should be substituted\nwith information from this dictionary.",
+            "deprecated": true,
+            "description": "Dictionary/map of associated data/information relevant to the error.\nThe error \"message\" may contain {{name}} escapes that should be substituted\nwith information from this dictionary.\n\nDeprecated: Use \"values\" instead.",
             "type": "object"
           },
           "domain": {
-            "description": "The \"domain\" for the error.  If empty, it is an EDA\ncore error.  Alternatively it can be an EDA application\n\"apiVersion\" value (e.g. interfaces.eda.nokia.com/v1alpha1)\nindicating that the error is specific to that application.\nThe domain gives the receiver information that they can use\nto help them interpret the \"internal\" error code value, or\nto find an internationalization translation for the message.",
+            "description": "The \"domain\" for the error.  If empty, it is an EDA\ncore error.  Alternatively it can be an EDA application\n\"apiVersion\" value (e.g. interfaces.eda.nokia.com/v1alpha1)\nindicating that the error is specific to that application.\nThe domain gives the receiver information that they can use\nto help them interpret the \"type\" field.",
             "type": "string"
           },
           "errors": {
-            "description": "Collection of errors in cases where more than one exists. This needs to be\nflexible so we can support multiple formats",
+            "deprecated": true,
+            "description": "Collection of errors in cases where more than one exists.\nThis needs to be flexible so we can support multiple formats.\nDeprecated: Replaced by `causeCollection` or `causeIndexedCollection` instead.",
             "items": {
               "$ref": "#/components/schemas/ErrorItem"
             },
@@ -88,7 +116,8 @@
             "$ref": "#/components/schemas/ErrorIndex"
           },
           "internal": {
-            "description": "Internal error code in cases where we don't have an array of errors",
+            "deprecated": true,
+            "description": "Internal error code number.\n\nDeprecated: \"type\" \u0026 \"domain\" should be used instead to uniquely identify this error.",
             "format": "int64",
             "type": "integer"
           },
@@ -97,19 +126,45 @@
             "type": "string"
           },
           "ref": {
-            "description": "Reference to the error source. Should typically be the URI of the request",
+            "description": "Reference to the error source. Should typically be the URI of the request.",
             "type": "string"
           },
           "type": {
-            "description": "URI pointing at a document that describes the error and mitigation steps\nIf there is no document, point to the RFC for the HTTP error code",
+            "description": "Type defines a unique identifier for the error, within the domain.\nThis may be used (along with the domain) to find an internationalization translation for the message.\n\nSHOULD be a valid golang identifier, and SHOULD be in UpperCamelCase.",
             "type": "string"
+          },
+          "values": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "description": "Associated data/information.\nThe error \"message\" may contain {{name}} escapes that should be substituted with information from this dictionary.\n\nNote that this map MUST NOT contain JSON objects (`{...}`) or arrays (`[...]`), only simple JSON types are permitted.",
+            "type": "object"
           }
         },
         "required": [
-          "code",
-          "message"
+          "internal",
+          "message",
+          "type"
         ],
+        "title": "Generic error response for REST APIs.",
         "type": "object"
+      },
+      "IntentTarget": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "IntentTargets": {
+        "items": {
+          "$ref": "#/components/schemas/IntentTarget"
+        },
+        "type": "array"
       },
       "K8SPatchOp": {
         "properties": {
@@ -135,8 +190,28 @@
         ],
         "type": "object"
       },
+      "K8STopologyRequest": {
+        "properties": {
+          "filter": {
+            "$ref": "#/components/schemas/TopoStateFilter"
+          },
+          "recurse": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "OverlayState": {
         "properties": {
+          "link_groups": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TopoOverlayLinkGroup"
+            },
+            "type": "object"
+          },
           "links": {
             "additionalProperties": {
               "$ref": "#/components/schemas/TopoOverlayLink"
@@ -146,6 +221,12 @@
           "nodes": {
             "additionalProperties": {
               "$ref": "#/components/schemas/TopoOverlayNode"
+            },
+            "type": "object"
+          },
+          "nodes_and_groups": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TopoOverlayNodeOrGroup"
             },
             "type": "object"
           }
@@ -295,6 +376,51 @@
         },
         "type": "object"
       },
+      "TopoAttribute": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoBoolExpression": {
+        "properties": {
+          "endpoint_expression": {
+            "$ref": "#/components/schemas/TopoEndpointBoolExpression"
+          },
+          "fixed_expression": {
+            "$ref": "#/components/schemas/TopoFixedBoolExpression"
+          },
+          "has_badge": {
+            "$ref": "#/components/schemas/TopoLiteralStatusOrBadge"
+          },
+          "label": {
+            "$ref": "#/components/schemas/TopoLabelSelector"
+          },
+          "literal": {
+            "$ref": "#/components/schemas/TopoBoolLiteral"
+          },
+          "logical": {
+            "$ref": "#/components/schemas/TopoLogicalExpression"
+          },
+          "not": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
+          },
+          "value_expression": {
+            "$ref": "#/components/schemas/TopoValueExpression"
+          }
+        },
+        "type": "object"
+      },
+      "TopoBoolLiteral": {
+        "properties": {
+          "value": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "TopoElemMetadata": {
         "properties": {
           "attributes": {
@@ -315,16 +441,87 @@
         },
         "type": "object"
       },
-      "TopoLinkEndpoint": {
+      "TopoEndpointBoolExpression": {
         "properties": {
           "endpoint": {
             "type": "string"
           },
-          "node": {
+          "expression": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
+          }
+        },
+        "type": "object"
+      },
+      "TopoField": {
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoFixedBoolExpression": {
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoLabelSelector": {
+        "properties": {
+          "selector": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TopoLiteralStatusOrBadge": {
+        "properties": {
+          "overlay": {
             "type": "string"
           },
-          "node_key": {
+          "value": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "TopoLiteralValue": {
+        "properties": {
+          "badge": {
+            "$ref": "#/components/schemas/TopoLiteralStatusOrBadge"
+          },
+          "bool": {
+            "type": "boolean"
+          },
+          "number": {
+            "format": "double",
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TopoLiteralStatusOrBadge"
+          },
+          "string": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoLogicalExpression": {
+        "properties": {
+          "left": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "right": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
           }
         },
         "type": "object"
@@ -332,6 +529,9 @@
       "TopoNodeGrouping": {
         "properties": {
           "group": {
+            "type": "string"
+          },
+          "group_key": {
             "type": "string"
           },
           "tier": {
@@ -364,6 +564,12 @@
           "namespace": {
             "type": "string"
           },
+          "node": {
+            "type": "string"
+          },
+          "node_key": {
+            "type": "string"
+          },
           "overlays": {
             "additionalProperties": {
               "$ref": "#/components/schemas/TopoOverlayEndpointState"
@@ -372,10 +578,6 @@
           },
           "schema": {
             "$ref": "#/components/schemas/TopoSchema"
-          },
-          "state": {
-            "format": "int64",
-            "type": "integer"
           },
           "ui_name": {
             "type": "string"
@@ -404,16 +606,19 @@
             "type": "string"
           },
           "endpoint_a": {
-            "$ref": "#/components/schemas/TopoLinkEndpoint"
-          },
-          "endpoint_a_details": {
             "$ref": "#/components/schemas/TopoOverlayEndpoint"
+          },
+          "endpoint_a_name": {
+            "type": "string"
           },
           "endpoint_b": {
-            "$ref": "#/components/schemas/TopoLinkEndpoint"
-          },
-          "endpoint_b_details": {
             "$ref": "#/components/schemas/TopoOverlayEndpoint"
+          },
+          "endpoint_b_name": {
+            "type": "string"
+          },
+          "group_key": {
+            "type": "string"
           },
           "key": {
             "type": "string"
@@ -439,11 +644,38 @@
           "schema": {
             "$ref": "#/components/schemas/TopoSchema"
           },
-          "state": {
-            "format": "int64",
-            "type": "integer"
-          },
           "ui_name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoOverlayLinkGroup": {
+        "properties": {
+          "endpoint_a": {
+            "$ref": "#/components/schemas/TopoOverlayLinkGroupEndpoint"
+          },
+          "endpoint_b": {
+            "$ref": "#/components/schemas/TopoOverlayLinkGroupEndpoint"
+          },
+          "key": {
+            "type": "string"
+          },
+          "overlays": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TopoOverlayLinkState"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "TopoOverlayLinkGroupEndpoint": {
+        "properties": {
+          "group_key": {
+            "type": "string"
+          },
+          "node_key": {
             "type": "string"
           }
         },
@@ -465,13 +697,6 @@
               "type": "object"
             },
             "type": "object"
-          },
-          "badges": {
-            "items": {
-              "format": "int64",
-              "type": "integer"
-            },
-            "type": "array"
           },
           "cr_name": {
             "type": "string"
@@ -503,9 +728,56 @@
           "schema": {
             "$ref": "#/components/schemas/TopoSchema"
           },
-          "state": {
+          "ui_name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoOverlayNodeOrGroup": {
+        "properties": {
+          "attributes": {
+            "additionalProperties": {
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "cr_name": {
+            "type": "string"
+          },
+          "grouping": {
+            "$ref": "#/components/schemas/TopoNodeGrouping"
+          },
+          "key": {
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "num_nodes": {
             "format": "int64",
             "type": "integer"
+          },
+          "overlays": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TopoOverlayNodeState"
+            },
+            "type": "object"
+          },
+          "schema": {
+            "$ref": "#/components/schemas/TopoSchema"
+          },
+          "type": {
+            "type": "string"
           },
           "ui_name": {
             "type": "string"
@@ -529,6 +801,14 @@
         },
         "type": "object"
       },
+      "TopoOverlayValue": {
+        "properties": {
+          "overlay": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "TopoSchema": {
         "properties": {
           "group": {
@@ -539,6 +819,69 @@
           },
           "version": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TopoStateFilter": {
+        "properties": {
+          "expand_all_link_groups": {
+            "type": "boolean"
+          },
+          "expand_all_node_groups": {
+            "type": "boolean"
+          },
+          "expanded_link_groups": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "expanded_node_groups": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "link_filter": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
+          },
+          "node_filter": {
+            "$ref": "#/components/schemas/TopoBoolExpression"
+          }
+        },
+        "type": "object"
+      },
+      "TopoValue": {
+        "properties": {
+          "attribute": {
+            "$ref": "#/components/schemas/TopoAttribute"
+          },
+          "badge": {
+            "$ref": "#/components/schemas/TopoOverlayValue"
+          },
+          "field": {
+            "$ref": "#/components/schemas/TopoField"
+          },
+          "literal": {
+            "$ref": "#/components/schemas/TopoLiteralValue"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TopoOverlayValue"
+          }
+        },
+        "type": "object"
+      },
+      "TopoValueExpression": {
+        "properties": {
+          "left": {
+            "$ref": "#/components/schemas/TopoValue"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "right": {
+            "$ref": "#/components/schemas/TopoValue"
           }
         },
         "type": "object"
@@ -616,16 +959,6 @@
         ],
         "type": "object"
       },
-      "WorkflowId": {
-        "properties": {
-          "id": {
-            "description": "A workflow identifier; these are assigned by the system to a posted workflow.",
-            "format": "int64",
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      },
       "WorkflowIdentifier": {
         "properties": {
           "group": {
@@ -677,6 +1010,9 @@
       "com.nokia.eda.routing.v1alpha1.AttachmentLookup": {
         "description": "AttachmentLookup is the Schema for the attachmentlookups API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -685,6 +1021,9 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup_deviations"
           },
           "kind": {
             "default": "AttachmentLookup",
@@ -718,7 +1057,17 @@
                   "type": "string"
                 },
                 "title": "Node Selectors",
-                "type": "array"
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "core.eda.nokia.com",
+                      "kind": "TopoNode",
+                      "type": "labelselector"
+                    }
+                  ]
+                }
               },
               "nodes": {
                 "description": "Nodes is a list of node names to execute lookups on.",
@@ -822,6 +1171,73 @@
         ],
         "type": "object"
       },
+      "com.nokia.eda.routing.v1alpha1.AttachmentLookup_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.AttachmentLookup_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
       "com.nokia.eda.routing.v1alpha1.AttachmentLookup_metadata": {
         "properties": {
           "annotations": {
@@ -891,6 +1307,9 @@
       "com.nokia.eda.routing.v1alpha1.DefaultInterface": {
         "description": "DefaultInterface is the Schema for the defaultinterfaces API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -899,6 +1318,9 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface_deviations"
           },
           "kind": {
             "default": "DefaultInterface",
@@ -990,7 +1412,7 @@
                     }
                   },
                   "ttl": {
-                    "description": "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.",
+                    "description": "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not applicable to single-hop BFD sessions.",
                     "maximum": 255,
                     "minimum": 2,
                     "title": "IP TTL/Hop Limit",
@@ -1081,6 +1503,7 @@
                   "properties": {
                     "ipPrefix": {
                       "description": "Address and mask to use",
+                      "format": "ip",
                       "title": "IP Prefix",
                       "type": "string",
                       "x-eda-nokia-com": {
@@ -1112,6 +1535,7 @@
                   "properties": {
                     "ipPrefix": {
                       "description": "Address and mask to use",
+                      "format": "ip",
                       "title": "IP Prefix",
                       "type": "string",
                       "x-eda-nokia-com": {
@@ -1134,6 +1558,16 @@
                 "x-eda-nokia-com": {
                   "ui-column-span": 4,
                   "ui-order-priority": 500
+                }
+              },
+              "subinterfaceIndex": {
+                "description": "Subinterface index to use with this DefaultInterface. Ignored for platforms that do not support subinterface index",
+                "title": "Sub Interface Index",
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 201,
+                  "ui-visible-if": "false"
                 }
               },
               "unnumbered": {
@@ -1177,23 +1611,39 @@
               "health": {
                 "description": "Indicates the health score of the DefaultInterface.",
                 "title": "Health",
-                "type": "integer"
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 200,
+                  "ui-single-line-group": "Health"
+                }
               },
               "healthScoreReason": {
                 "description": "Indicates the reason for the health score.",
                 "title": "Health Score Reason",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 300
+                }
               },
               "lastChange": {
                 "description": "Indicates when this Interface last changed state.",
                 "format": "date-time",
                 "title": "Last Change",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 400
+                }
               },
               "operationalState": {
                 "description": "Indicates the current operational state of the DefaultInterface.",
                 "title": "Operational State",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 100,
+                  "ui-single-line-group": "Health"
+                }
               }
             },
             "readOnly": true,
@@ -1210,7 +1660,23 @@
           "metadata",
           "spec"
         ],
-        "type": "object"
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-default-columns": [
+            ".metadata.name",
+            ".metadata.namespace",
+            ".metadata.labels",
+            ".metadata.annotations",
+            ".deviations.count",
+            ".status.operationalState",
+            ".status.health",
+            ".status.healthScoreReason",
+            ".status.lastChange",
+            ".spec.description",
+            ".spec.defaultRouter",
+            ".spec.interface"
+          ]
+        }
       },
       "com.nokia.eda.routing.v1alpha1.DefaultInterfaceList": {
         "description": "DefaultInterfaceList is a list of defaultinterfaces",
@@ -1287,6 +1753,73 @@
         },
         "type": "array"
       },
+      "com.nokia.eda.routing.v1alpha1.DefaultInterface_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.DefaultInterface_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
       "com.nokia.eda.routing.v1alpha1.DefaultInterface_metadata": {
         "properties": {
           "annotations": {
@@ -1356,6 +1889,9 @@
       "com.nokia.eda.routing.v1alpha1.DefaultRouter": {
         "description": "DefaultRouter is the Schema for the defaultrouters API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -1364,6 +1900,9 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter_deviations"
           },
           "kind": {
             "default": "DefaultRouter",
@@ -1777,6 +2316,17 @@
                   "ui-order-priority": 200
                 }
               },
+              "ecmp": {
+                "description": "Set the maximum number of ECMP paths for the DefaultRouter. This is supported only by some platforms, and will be ignored for others.",
+                "maximum": 256,
+                "minimum": 1,
+                "title": "Maximum ECMP Paths",
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 5000
+                }
+              },
               "exportPolicy": {
                 "description": "Reference to a Policy resource to use when evaluating route exports from the DefaultRouter.",
                 "items": {
@@ -1921,23 +2471,39 @@
               "health": {
                 "description": "Indicates the health score of the Router.",
                 "title": "Health",
-                "type": "integer"
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 200,
+                  "ui-single-line-group": "Health"
+                }
               },
               "healthScoreReason": {
                 "description": "Indicates the reason for the health score.",
                 "title": "Health Score Reason",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 300
+                }
               },
               "lastChange": {
                 "description": "The time when the state of the resource last changed.",
                 "format": "date-time",
                 "title": "Last Change",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 400
+                }
               },
               "operationalState": {
                 "description": "Operational state of the Router.",
                 "title": "Operational State",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 100,
+                  "ui-single-line-group": "Health"
+                }
               }
             },
             "readOnly": true,
@@ -1954,7 +2520,25 @@
           "metadata",
           "spec"
         ],
-        "type": "object"
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-default-columns": [
+            ".metadata.name",
+            ".metadata.namespace",
+            ".metadata.labels",
+            ".metadata.annotations",
+            ".deviations.count",
+            ".status.operationalState",
+            ".status.health",
+            ".status.healthScoreReason",
+            ".status.lastChange",
+            ".spec.node",
+            ".spec.routerID",
+            ".spec.description",
+            ".spec.bgp.enabled",
+            ".spec.bgp.autonomousSystem"
+          ]
+        }
       },
       "com.nokia.eda.routing.v1alpha1.DefaultRouterList": {
         "description": "DefaultRouterList is a list of defaultrouters",
@@ -2031,6 +2615,73 @@
         },
         "type": "array"
       },
+      "com.nokia.eda.routing.v1alpha1.DefaultRouter_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.DefaultRouter_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
       "com.nokia.eda.routing.v1alpha1.DefaultRouter_metadata": {
         "properties": {
           "annotations": {
@@ -2100,6 +2751,9 @@
       "com.nokia.eda.routing.v1alpha1.Drain": {
         "description": "Drain is the Schema for the drains API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -2108,6 +2762,9 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain_deviations"
           },
           "kind": {
             "default": "Drain",
@@ -2133,6 +2790,14 @@
                 "title": "Default Router Selector",
                 "type": "array",
                 "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "routing.eda.nokia.com",
+                      "kind": "DefaultRouter",
+                      "type": "labelselector"
+                    }
+                  ],
                   "ui-category": "DefaultRouter",
                   "ui-column-span": 2,
                   "ui-order-priority": 200,
@@ -2281,6 +2946,73 @@
         },
         "type": "array"
       },
+      "com.nokia.eda.routing.v1alpha1.Drain_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.Drain_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
       "com.nokia.eda.routing.v1alpha1.Drain_metadata": {
         "properties": {
           "annotations": {
@@ -2350,6 +3082,9 @@
       "com.nokia.eda.routing.v1alpha1.RouteLookup": {
         "description": "RouteLookup is the Schema for the routelookups API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -2358,6 +3093,9 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup_deviations"
           },
           "kind": {
             "default": "RouteLookup",
@@ -2391,7 +3129,17 @@
                   "type": "string"
                 },
                 "title": "Node Selectors",
-                "type": "array"
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "core.eda.nokia.com",
+                      "kind": "TopoNode",
+                      "type": "labelselector"
+                    }
+                  ]
+                }
               },
               "nodes": {
                 "description": "Nodes is a list of node names to execute lookups on.",
@@ -2479,6 +3227,10 @@
                           "interfaces": {
                             "items": {
                               "properties": {
+                                "localAddress": {
+                                  "description": "Local IP address of the egress interface",
+                                  "type": "string"
+                                },
                                 "name": {
                                   "description": "Name of the egress interface.",
                                   "type": "string"
@@ -2572,6 +3324,73 @@
         ],
         "type": "object"
       },
+      "com.nokia.eda.routing.v1alpha1.RouteLookup_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.RouteLookup_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
       "com.nokia.eda.routing.v1alpha1.RouteLookup_metadata": {
         "properties": {
           "annotations": {
@@ -2638,9 +3457,12 @@
           "ui-title-key": "metadata"
         }
       },
-      "com.nokia.eda.routing.v1alpha1.SystemInterface": {
-        "description": "SystemInterface is the Schema for the systeminterfaces API",
+      "com.nokia.eda.routing.v1alpha1.RouteTrace": {
+        "description": "RouteTrace is the Schema for the routetraces API",
         "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace_alarms"
+          },
           "apiVersion": {
             "default": "routing.eda.nokia.com/v1alpha1",
             "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
@@ -2649,6 +3471,328 @@
               "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
               "ui-visible-if": "false"
             }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace_deviations"
+          },
+          "kind": {
+            "default": "RouteTrace",
+            "pattern": "^RouteTrace$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "ui-pattern-error": "The kind must be set to RouteTrace",
+              "ui-visible-if": "false"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace_metadata"
+          },
+          "spec": {
+            "description": "RouteTraceSpec defines the desired state of RouteTrace",
+            "properties": {
+              "address": {
+                "description": "This is a standard IPv4 or IPv6 address, excluding mask or prefix length, e.g. 12.0.0.1.",
+                "title": "Address",
+                "type": "string"
+              },
+              "networkInstance": {
+                "description": "Network Instance is the locally named network instance to use for the lookup.\nCan be omitted if the default network instance is to be used.",
+                "title": "Network Instance",
+                "type": "string"
+              },
+              "node": {
+                "description": "Node is the name of the node to execute lookups on.",
+                "title": "Nodes",
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "core.eda.nokia.com",
+                      "resource": "toponodes",
+                      "subject": true,
+                      "type": "gvr",
+                      "version": "v1"
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "address",
+              "node"
+            ],
+            "title": "Specification",
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 30
+            }
+          },
+          "status": {
+            "description": "RouteTraceStatus defines the observed state of RouteTrace",
+            "properties": {
+              "links": {
+                "items": {
+                  "properties": {
+                    "fromNode": {
+                      "properties": {
+                        "destination": {
+                          "description": "Extract indicate the from node owns the address.",
+                          "type": "boolean"
+                        },
+                        "direct": {
+                          "description": "Direct indicates that the host is directly connected to the node.",
+                          "type": "boolean"
+                        },
+                        "error": {
+                          "description": "If the trace is not successful, this field will contain an error message on the 'to' node.",
+                          "type": "string"
+                        },
+                        "interface": {
+                          "description": "Interface is the name of the interface on the node that the trace is either entering or exiting.",
+                          "type": "string"
+                        },
+                        "localAddress": {
+                          "description": "LocalAddress is the local address of the endpoint (e.g. the nexthop address on the 'to' node).",
+                          "type": "string"
+                        },
+                        "node": {
+                          "description": "Node is the name of the node where the endpoint is located.",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "toNode": {
+                      "properties": {
+                        "destination": {
+                          "description": "Extract indicate the from node owns the address.",
+                          "type": "boolean"
+                        },
+                        "direct": {
+                          "description": "Direct indicates that the host is directly connected to the node.",
+                          "type": "boolean"
+                        },
+                        "error": {
+                          "description": "If the trace is not successful, this field will contain an error message on the 'to' node.",
+                          "type": "string"
+                        },
+                        "interface": {
+                          "description": "Interface is the name of the interface on the node that the trace is either entering or exiting.",
+                          "type": "string"
+                        },
+                        "localAddress": {
+                          "description": "LocalAddress is the local address of the endpoint (e.g. the nexthop address on the 'to' node).",
+                          "type": "string"
+                        },
+                        "node": {
+                          "description": "Node is the name of the node where the endpoint is located.",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "fromNode",
+                    "toNode"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "readOnly": true,
+            "required": [
+              "links"
+            ],
+            "title": "Status",
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 20
+            }
+          }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "com.nokia.eda.routing.v1alpha1.RouteTraceList": {
+        "description": "RouteTraceList is a list of routetraces",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiVersion",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "com.nokia.eda.routing.v1alpha1.RouteTrace_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.RouteTrace_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.RouteTrace_metadata": {
+        "properties": {
+          "annotations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 40,
+              "ui-title": "Annotations",
+              "ui-title-key": "annotations"
+            }
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-auto-completes": [
+                {
+                  "condition": "true",
+                  "group": "routing.eda.nokia.com",
+                  "kind": "RouteTrace",
+                  "type": "label",
+                  "version": "v1alpha1"
+                }
+              ],
+              "ui-order-priority": 30,
+              "ui-title": "Labels",
+              "ui-title-key": "labels"
+            }
+          },
+          "name": {
+            "maxLength": 253,
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "immutable": true,
+              "ui-order-priority": 10,
+              "ui-pattern-error": "A valid name is made up of one or more components where each component is separated by period characters.  Each component must start and end with a lower case alphanumeric character and the body of the component is made up of zero or more lower case alphanumeric and hyphen characters.",
+              "ui-title": "Name",
+              "ui-title-key": "name"
+            }
+          },
+          "namespace": {
+            "type": "string",
+            "x-eda-nokia-com": {
+              "immutable": true,
+              "ui-order-priority": 20,
+              "ui-title": "Namespace",
+              "ui-title-key": "namespace"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "namespace"
+        ],
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 10,
+          "ui-title": "Metadata",
+          "ui-title-key": "metadata"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemInterface": {
+        "description": "SystemInterface is the Schema for the systeminterfaces API",
+        "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface_alarms"
+          },
+          "apiVersion": {
+            "default": "routing.eda.nokia.com/v1alpha1",
+            "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
+              "ui-visible-if": "false"
+            }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface_deviations"
           },
           "kind": {
             "default": "SystemInterface",
@@ -2740,7 +3884,7 @@
                     }
                   },
                   "ttl": {
-                    "description": "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not appllicable to single-hop BFD sessions.",
+                    "description": "Sets custom IP TTL or Hop Limit for multi-hop BFD sessions packets. Not applicable to single-hop BFD sessions.",
                     "maximum": 255,
                     "minimum": 2,
                     "title": "IP TTL/Hop Limit",
@@ -2830,23 +3974,39 @@
               "health": {
                 "description": "Indicates the health score of the SystemInterface.",
                 "title": "Health",
-                "type": "integer"
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 200,
+                  "ui-single-line-group": "Health"
+                }
               },
               "healthScoreReason": {
                 "description": "Indicates the reason for the health score.",
                 "title": "Health Score Reason",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 300
+                }
               },
               "lastChange": {
                 "description": "Indicates when this Interface last changed state.",
                 "format": "date-time",
                 "title": "Last Change",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-order-priority": 400
+                }
               },
               "operationalState": {
                 "description": "Indicates the current operational state of the SystemInterface.",
                 "title": "Operational State",
-                "type": "string"
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 100,
+                  "ui-single-line-group": "Health"
+                }
               }
             },
             "readOnly": true,
@@ -2863,7 +4023,24 @@
           "metadata",
           "spec"
         ],
-        "type": "object"
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-default-columns": [
+            ".metadata.name",
+            ".metadata.namespace",
+            ".metadata.labels",
+            ".metadata.annotations",
+            ".deviations.count",
+            ".status.operationalState",
+            ".status.health",
+            ".status.healthScoreReason",
+            ".status.lastChange",
+            ".spec.description",
+            ".spec.defaultRouter",
+            ".spec.ipv4Address",
+            ".spec.ipv6Address"
+          ]
+        }
       },
       "com.nokia.eda.routing.v1alpha1.SystemInterfaceList": {
         "description": "SystemInterfaceList is a list of systeminterfaces",
@@ -2939,6 +4116,73 @@
           "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface_DeletedResourceEntry"
         },
         "type": "array"
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemInterface_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemInterface_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
       },
       "com.nokia.eda.routing.v1alpha1.SystemInterface_metadata": {
         "properties": {
@@ -3032,6 +4276,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/AppGroup"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppGroup"
+                }
               }
             },
             "description": "OK"
@@ -3060,6 +4309,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/ResourceList"
                 }
@@ -3102,6 +4356,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UIResult"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/UIResult"
                 }
@@ -3165,6 +4424,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -3175,6 +4443,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
                 }
@@ -3239,6 +4512,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -3249,6 +4531,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
                 }
@@ -3313,6 +4600,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -3323,6 +4619,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
                 }
@@ -3352,18 +4653,49 @@
         "operationId": "deleteAllRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
           {
-            "description": "the namespace scope from which to perform the delete",
-            "in": "path",
-            "name": "namespace",
-            "required": true,
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
             "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
               "type": "string"
             }
           },
           {
             "description": "a label selector string to filter the set of CRs deleted based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the set of CRs deleted based on CR labels",
+            "in": "query",
             "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "the namespace scope from which to perform the delete",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -3373,6 +4705,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
                 }
@@ -3435,6 +4772,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -3454,6 +4800,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterfaceList"
                 }
@@ -3482,6 +4833,28 @@
         "operationId": "createRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -3504,6 +4877,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
                 }
@@ -3564,6 +4942,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface_DeletedResources"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface_DeletedResources"
+                }
               }
             },
             "description": "Returns list of deleted resource entries"
@@ -3591,6 +4974,28 @@
         "operationId": "deleteRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "description": "the namespace scope from which to perform the delete",
             "in": "path",
             "name": "namespace",
@@ -3613,6 +5018,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/Status"
                 }
@@ -3689,6 +5099,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
+                }
               }
             },
             "description": "OK"
@@ -3712,6 +5127,28 @@
         "description": "patch a DefaultInterface",
         "operationId": "patchRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -3746,6 +5183,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
+                }
               }
             },
             "description": "OK"
@@ -3769,6 +5211,28 @@
         "description": "replace a DefaultInterface",
         "operationId": "replaceRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -3800,6 +5264,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultInterface"
                 }
@@ -3879,6 +5348,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceHistory"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceHistory"
+                }
               }
             },
             "description": "Returns the change history of the specified resource"
@@ -3900,8 +5374,82 @@
         ]
       }
     },
+    "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_targets": {
+      "get": {
+        "operationId": "getTargetsRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
+        "parameters": [
+          {
+            "description": "name of the DefaultInterface",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              }
+            },
+            "description": "Returns the list of intent targets for the specified DefaultInterface resource."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get intent targets for the specified namespaced DefaultInterface.",
+        "tags": [
+          "apps"
+        ]
+      }
+    },
     "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_topology": {
       "get": {
+        "deprecated": true,
+        "description": "Get the topology for the specified namespaced DefaultInterface.  This API is deprecated and the POST\nAPI should be used instead.",
         "operationId": "getTopologyRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
         "parameters": [
           {
@@ -3970,6 +5518,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceTopology"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
               }
             },
             "description": "Returns the topology of the specified resource"
@@ -3985,7 +5538,87 @@
             "description": "Details of an error in response to an API REST request."
           }
         },
-        "summary": "Get the topology for the specified namespaced DefaultInterface.",
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "postTopologyRoutingEdaNokiaComV1alpha1NamespaceDefaultinterfaces",
+        "parameters": [
+          {
+            "description": "name of the DefaultInterface to retrieve",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope from which to retrieve the result",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/K8STopologyRequest"
+              }
+            }
+          },
+          "description": "the details of topology to retrieve",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              }
+            },
+            "description": "Returns the topology of the specified resource"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Retrieve the topology for the specified namespaced DefaultInterface.",
         "tags": [
           "apps"
         ]
@@ -3996,18 +5629,49 @@
         "operationId": "deleteAllRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
           {
-            "description": "the namespace scope from which to perform the delete",
-            "in": "path",
-            "name": "namespace",
-            "required": true,
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
             "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
               "type": "string"
             }
           },
           {
             "description": "a label selector string to filter the set of CRs deleted based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the set of CRs deleted based on CR labels",
+            "in": "query",
             "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "the namespace scope from which to perform the delete",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -4017,6 +5681,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
                 }
@@ -4079,6 +5748,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -4098,6 +5776,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouterList"
                 }
@@ -4126,6 +5809,28 @@
         "operationId": "createRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -4148,6 +5853,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
                 }
@@ -4208,6 +5918,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter_DeletedResources"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter_DeletedResources"
+                }
               }
             },
             "description": "Returns list of deleted resource entries"
@@ -4235,6 +5950,28 @@
         "operationId": "deleteRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "description": "the namespace scope from which to perform the delete",
             "in": "path",
             "name": "namespace",
@@ -4257,6 +5994,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/Status"
                 }
@@ -4333,6 +6075,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
+                }
               }
             },
             "description": "OK"
@@ -4356,6 +6103,28 @@
         "description": "patch a DefaultRouter",
         "operationId": "patchRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -4390,6 +6159,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
+                }
               }
             },
             "description": "OK"
@@ -4413,6 +6187,28 @@
         "description": "replace a DefaultRouter",
         "operationId": "replaceRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -4444,6 +6240,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DefaultRouter"
                 }
@@ -4523,6 +6324,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceHistory"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceHistory"
+                }
               }
             },
             "description": "Returns the change history of the specified resource"
@@ -4544,8 +6350,82 @@
         ]
       }
     },
+    "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_targets": {
+      "get": {
+        "operationId": "getTargetsRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
+        "parameters": [
+          {
+            "description": "name of the DefaultRouter",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              }
+            },
+            "description": "Returns the list of intent targets for the specified DefaultRouter resource."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get intent targets for the specified namespaced DefaultRouter.",
+        "tags": [
+          "apps"
+        ]
+      }
+    },
     "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_topology": {
       "get": {
+        "deprecated": true,
+        "description": "Get the topology for the specified namespaced DefaultRouter.  This API is deprecated and the POST\nAPI should be used instead.",
         "operationId": "getTopologyRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
         "parameters": [
           {
@@ -4614,6 +6494,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceTopology"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
               }
             },
             "description": "Returns the topology of the specified resource"
@@ -4629,7 +6514,87 @@
             "description": "Details of an error in response to an API REST request."
           }
         },
-        "summary": "Get the topology for the specified namespaced DefaultRouter.",
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "postTopologyRoutingEdaNokiaComV1alpha1NamespaceDefaultrouters",
+        "parameters": [
+          {
+            "description": "name of the DefaultRouter to retrieve",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope from which to retrieve the result",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/K8STopologyRequest"
+              }
+            }
+          },
+          "description": "the details of topology to retrieve",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              }
+            },
+            "description": "Returns the topology of the specified resource"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Retrieve the topology for the specified namespaced DefaultRouter.",
         "tags": [
           "apps"
         ]
@@ -4640,18 +6605,49 @@
         "operationId": "deleteAllRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
           {
-            "description": "the namespace scope from which to perform the delete",
-            "in": "path",
-            "name": "namespace",
-            "required": true,
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
             "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
               "type": "string"
             }
           },
           {
             "description": "a label selector string to filter the set of CRs deleted based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the set of CRs deleted based on CR labels",
+            "in": "query",
             "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "the namespace scope from which to perform the delete",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -4661,6 +6657,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
                 }
@@ -4723,6 +6724,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -4742,6 +6752,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.DrainList"
                 }
@@ -4770,6 +6785,28 @@
         "operationId": "createRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -4792,6 +6829,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
                 }
@@ -4852,6 +6894,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain_DeletedResources"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain_DeletedResources"
+                }
               }
             },
             "description": "Returns list of deleted resource entries"
@@ -4879,6 +6926,28 @@
         "operationId": "deleteRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "description": "the namespace scope from which to perform the delete",
             "in": "path",
             "name": "namespace",
@@ -4901,6 +6970,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/Status"
                 }
@@ -4977,6 +7051,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
+                }
               }
             },
             "description": "OK"
@@ -5000,6 +7079,28 @@
         "description": "patch a Drain",
         "operationId": "patchRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -5034,6 +7135,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
+                }
               }
             },
             "description": "OK"
@@ -5057,6 +7163,28 @@
         "description": "replace a Drain",
         "operationId": "replaceRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -5088,6 +7216,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.Drain"
                 }
@@ -5167,6 +7300,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceHistory"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceHistory"
+                }
               }
             },
             "description": "Returns the change history of the specified resource"
@@ -5188,8 +7326,82 @@
         ]
       }
     },
+    "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_targets": {
+      "get": {
+        "operationId": "getTargetsRoutingEdaNokiaComV1alpha1NamespaceDrains",
+        "parameters": [
+          {
+            "description": "name of the Drain",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              }
+            },
+            "description": "Returns the list of intent targets for the specified Drain resource."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get intent targets for the specified namespaced Drain.",
+        "tags": [
+          "apps"
+        ]
+      }
+    },
     "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_topology": {
       "get": {
+        "deprecated": true,
+        "description": "Get the topology for the specified namespaced Drain.  This API is deprecated and the POST\nAPI should be used instead.",
         "operationId": "getTopologyRoutingEdaNokiaComV1alpha1NamespaceDrains",
         "parameters": [
           {
@@ -5258,6 +7470,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceTopology"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
               }
             },
             "description": "Returns the topology of the specified resource"
@@ -5273,7 +7490,87 @@
             "description": "Details of an error in response to an API REST request."
           }
         },
-        "summary": "Get the topology for the specified namespaced Drain.",
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "postTopologyRoutingEdaNokiaComV1alpha1NamespaceDrains",
+        "parameters": [
+          {
+            "description": "name of the Drain to retrieve",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope from which to retrieve the result",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/K8STopologyRequest"
+              }
+            }
+          },
+          "description": "the details of topology to retrieve",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              }
+            },
+            "description": "Returns the topology of the specified resource"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Retrieve the topology for the specified namespaced Drain.",
         "tags": [
           "apps"
         ]
@@ -5284,18 +7581,49 @@
         "operationId": "deleteAllRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
           {
-            "description": "the namespace scope from which to perform the delete",
-            "in": "path",
-            "name": "namespace",
-            "required": true,
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
             "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
               "type": "string"
             }
           },
           {
             "description": "a label selector string to filter the set of CRs deleted based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the set of CRs deleted based on CR labels",
+            "in": "query",
             "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "the namespace scope from which to perform the delete",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -5305,6 +7633,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
                 }
@@ -5367,6 +7700,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -5386,6 +7728,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
                 }
@@ -5414,6 +7761,28 @@
         "operationId": "createRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -5436,6 +7805,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
                 }
@@ -5496,6 +7870,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface_DeletedResources"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface_DeletedResources"
+                }
               }
             },
             "description": "Returns list of deleted resource entries"
@@ -5523,6 +7902,28 @@
         "operationId": "deleteRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
           {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
             "description": "the namespace scope from which to perform the delete",
             "in": "path",
             "name": "namespace",
@@ -5545,6 +7946,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/Status"
                 }
@@ -5621,6 +8027,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
+                }
               }
             },
             "description": "OK"
@@ -5644,6 +8055,28 @@
         "description": "patch a SystemInterface",
         "operationId": "patchRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -5678,6 +8111,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
+                }
               }
             },
             "description": "OK"
@@ -5701,6 +8139,28 @@
         "description": "replace a SystemInterface",
         "operationId": "replaceRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
+          {
+            "description": "The detail level to keep in the transaction log for the transaction resulting from this request.",
+            "in": "query",
+            "name": "detailLevel",
+            "schema": {
+              "default": "standard",
+              "enum": [
+                "standard",
+                "detailed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "If true, prevents the transaction resulting from this request from being bundled with others.",
+            "in": "query",
+            "name": "disableBatching",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
           {
             "in": "path",
             "name": "namespace",
@@ -5732,6 +8192,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterface"
                 }
@@ -5811,6 +8276,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceHistory"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceHistory"
+                }
               }
             },
             "description": "Returns the change history of the specified resource"
@@ -5832,8 +8302,82 @@
         ]
       }
     },
+    "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_targets": {
+      "get": {
+        "operationId": "getTargetsRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
+        "parameters": [
+          {
+            "description": "name of the SystemInterface",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntentTargets"
+                }
+              }
+            },
+            "description": "Returns the list of intent targets for the specified SystemInterface resource."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get intent targets for the specified namespaced SystemInterface.",
+        "tags": [
+          "apps"
+        ]
+      }
+    },
     "/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_topology": {
       "get": {
+        "deprecated": true,
+        "description": "Get the topology for the specified namespaced SystemInterface.  This API is deprecated and the POST\nAPI should be used instead.",
         "operationId": "getTopologyRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
         "parameters": [
           {
@@ -5902,6 +8446,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ResourceTopology"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
               }
             },
             "description": "Returns the topology of the specified resource"
@@ -5917,7 +8466,87 @@
             "description": "Details of an error in response to an API REST request."
           }
         },
-        "summary": "Get the topology for the specified namespaced SystemInterface.",
+        "tags": [
+          "apps"
+        ]
+      },
+      "post": {
+        "operationId": "postTopologyRoutingEdaNokiaComV1alpha1NamespaceSysteminterfaces",
+        "parameters": [
+          {
+            "description": "name of the SystemInterface to retrieve",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope from which to retrieve the result",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/K8STopologyRequest"
+              }
+            }
+          },
+          "description": "the details of topology to retrieve",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceTopology"
+                }
+              }
+            },
+            "description": "Returns the topology of the specified resource"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Retrieve the topology for the specified namespaced SystemInterface.",
         "tags": [
           "apps"
         ]
@@ -5963,6 +8592,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -5973,6 +8611,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemInterfaceList"
                 }
@@ -6036,6 +8679,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -6049,9 +8701,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -6109,6 +8766,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -6131,9 +8797,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.AttachmentLookupList"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -6156,7 +8827,7 @@
         "operationId": "wfCreateRoutingEdaNokiaComV1alpha1NamespaceAttachmentlookups",
         "parameters": [
           {
-            "description": "the namespace scope in which to create the AttachmentLookup",
+            "description": "the namespace scope in which to operate",
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -6180,11 +8851,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowId"
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup"
                 }
               }
             },
-            "description": "The response for a successful POST workflows request."
+            "description": "Created"
           },
           "default": {
             "content": {
@@ -6290,9 +8966,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.AttachmentLookup"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.AttachmentLookup"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -6338,6 +9019,14 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "items": {
                     "type": "string"
@@ -6400,12 +9089,6 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              },
               "application/octet-stream": {
                 "schema": {
                   "format": "binary",
@@ -6418,11 +9101,6 @@
           "default": {
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "application/octet-stream": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
@@ -6464,6 +9142,14 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "items": {
                     "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
@@ -6557,6 +9243,22 @@
             }
           },
           {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "the namespace scope in which to operate",
             "in": "path",
             "name": "namespace",
@@ -6570,6 +9272,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "type": "string"
                 }
@@ -6589,6 +9296,50 @@
           }
         },
         "summary": "Read logs output by the AttachmentLookup.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}/_terminate": {
+      "put": {
+        "operationId": "wfTerminateRoutingEdaNokiaComV1alpha1NamespaceAttachmentlookups",
+        "parameters": [
+          {
+            "description": "name of the AttachmentLookup",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Terminate a AttachmentLookup workflow.",
         "tags": [
           "workflows"
         ]
@@ -6633,6 +9384,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -6655,9 +9415,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookupList"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookupList"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.RouteLookupList"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -6680,7 +9445,7 @@
         "operationId": "wfCreateRoutingEdaNokiaComV1alpha1NamespaceRoutelookups",
         "parameters": [
           {
-            "description": "the namespace scope in which to create the RouteLookup",
+            "description": "the namespace scope in which to operate",
             "in": "path",
             "name": "namespace",
             "required": true,
@@ -6704,11 +9469,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkflowId"
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup"
                 }
               }
             },
-            "description": "The response for a successful POST workflows request."
+            "description": "Created"
           },
           "default": {
             "content": {
@@ -6814,9 +9584,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookup"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.RouteLookup"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -6862,6 +9637,14 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "items": {
                     "type": "string"
@@ -6924,12 +9707,6 @@
         "responses": {
           "200": {
             "content": {
-              "application/json": {
-                "schema": {
-                  "format": "binary",
-                  "type": "string"
-                }
-              },
               "application/octet-stream": {
                 "schema": {
                   "format": "binary",
@@ -6942,11 +9719,6 @@
           "default": {
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "application/octet-stream": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
@@ -6988,6 +9760,14 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "items": {
                     "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
@@ -7081,6 +9861,22 @@
             }
           },
           {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "the namespace scope in which to operate",
             "in": "path",
             "name": "namespace",
@@ -7094,6 +9890,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/yaml": {
                 "schema": {
                   "type": "string"
                 }
@@ -7113,6 +9914,668 @@
           }
         },
         "summary": "Read logs output by the RouteLookup.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}/_terminate": {
+      "put": {
+        "operationId": "wfTerminateRoutingEdaNokiaComV1alpha1NamespaceRoutelookups",
+        "parameters": [
+          {
+            "description": "name of the RouteLookup",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Terminate a RouteLookup workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces": {
+      "get": {
+        "operationId": "wfListRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.",
+            "in": "query",
+            "name": "fields",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "an EQL \"where\" expression that will be used to filter the set of resources returned.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTraceList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTraceList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "List all RouteTrace instances in this namespace.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "post": {
+        "description": "create a RouteTrace",
+        "operationId": "wfCreateRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}": {
+      "delete": {
+        "operationId": "wfDeleteRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Delete a RouteTrace workflow.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "get": {
+        "operationId": "wfReadRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTrace"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read the specified RouteTrace.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_artifacts": {
+      "get": {
+        "operationId": "wfListArtifactsRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "The response for a successful list artifacts request."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read list of artifacts generated by a RouteTrace workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_artifacts/{artifact}": {
+      "get": {
+        "operationId": "wfReadArtifactRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "name of the artifact to download",
+            "in": "path",
+            "name": "artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The binary content of the requested artifact."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read artifact generated by a RouteTrace workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input": {
+      "get": {
+        "operationId": "wfListInputRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List containing specifications for this flow \u0026 subflow's requested input."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get inputs requested by the RouteTrace.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "put": {
+        "operationId": "wfSubmitInputRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowInputData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Submit input requested by the RouteTrace.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_logs": {
+      "get": {
+        "operationId": "wfReadLogsRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The response for a successful GET logs request."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read logs output by the RouteTrace.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_terminate": {
+      "put": {
+        "operationId": "wfTerminateRoutingEdaNokiaComV1alpha1NamespaceRoutetraces",
+        "parameters": [
+          {
+            "description": "name of the RouteTrace",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Terminate a RouteTrace workflow.",
         "tags": [
           "workflows"
         ]
@@ -7157,6 +10620,15 @@
           {
             "description": "a label selector string to filter the results based on CR labels",
             "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
             "name": "label-selector",
             "schema": {
               "type": "string"
@@ -7170,9 +10642,14 @@
                 "schema": {
                   "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookupList"
                 }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteLookupList"
+                }
               }
             },
-            "description": "com.nokia.eda.routing.v1alpha1.RouteLookupList"
+            "description": "OK"
           },
           "default": {
             "content": {
@@ -7186,6 +10663,93 @@
           }
         },
         "summary": "List all RouteLookup instances.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/routetraces": {
+      "get": {
+        "operationId": "wfListRoutingEdaNokiaComV1alpha1Routetraces",
+        "parameters": [
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.",
+            "in": "query",
+            "name": "fields",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "an EQL \"where\" expression that will be used to filter the set of resources returned.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTraceList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.RouteTraceList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "List all RouteTrace instances.",
         "tags": [
           "workflows"
         ]

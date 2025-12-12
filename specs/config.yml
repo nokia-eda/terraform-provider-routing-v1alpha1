@@ -62,6 +62,16 @@ data_sources:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups
       method: GET
 
+  route_trace:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}
+      method: GET
+
+  route_trace_list:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces
+      method: GET
+
   system_interface:
     read:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
@@ -78,6 +88,17 @@ data_sources:
       method: GET
 
 resources:
+  attachment_lookup:
+    create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups
+      method: POST
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}
+      method: GET
+    delete:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}
+      method: DELETE
+
   default_interface:
     create:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces
@@ -118,6 +139,28 @@ resources:
       method: PUT
     delete:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: DELETE
+
+  route_lookup:
+    create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups
+      method: POST
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}
+      method: GET
+    delete:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routelookups/{name}
+      method: DELETE
+
+  route_trace:
+    create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces
+      method: POST
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}
+      method: GET
+    delete:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}
       method: DELETE
 
   system_interface:

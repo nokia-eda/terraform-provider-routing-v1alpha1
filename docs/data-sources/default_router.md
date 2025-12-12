@@ -27,7 +27,9 @@ description: |-
 
 ### Read-Only
 
+- `alarms` (Attributes) (see [below for nested schema](#nestedatt--alarms))
 - `api_version` (String)
+- `deviations` (Attributes) (see [below for nested schema](#nestedatt--deviations))
 - `kind` (String)
 - `metadata` (Attributes) (see [below for nested schema](#nestedatt--metadata))
 - `status` (Attributes) DefaultRouterStatus defines the observed state of DefaultRouter (see [below for nested schema](#nestedatt--status))
@@ -39,6 +41,7 @@ Optional:
 
 - `bgp` (Attributes) BGP configuration. (see [below for nested schema](#nestedatt--spec--bgp))
 - `description` (String) Sets the description on the Default router.
+- `ecmp` (Number) Set the maximum number of ECMP paths for the DefaultRouter. This is supported only by some platforms, and will be ignored for others.
 - `export_policy` (List of String) Reference to a Policy resource to use when evaluating route exports from the DefaultRouter.
 - `import_policy` (List of String) Reference to a Policy resource to use when evaluating route imports into the DefaultRouter.
 - `node` (String) Reference to a TopoNode on which to configure the default routing instance.
@@ -134,6 +137,25 @@ Optional:
 - `export_policy` (String) Reference to a Policy resource to use when evaluating route exports from the DefaultRouter.
 - `import_policy` (String) Reference to a Policy resource to use when evaluating route imports into the DefaultRouter.
 
+
+
+<a id="nestedatt--alarms"></a>
+### Nested Schema for `alarms`
+
+Read-Only:
+
+- `critical` (Number)
+- `major` (Number)
+- `minor` (Number)
+- `warning` (Number)
+
+
+<a id="nestedatt--deviations"></a>
+### Nested Schema for `deviations`
+
+Read-Only:
+
+- `count` (Number)
 
 
 <a id="nestedatt--metadata"></a>
