@@ -11,7 +11,7 @@ Path,Method,Schema,Model Name,Supported,Datasource,Resource
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/_deleted,GET,com.nokia.eda.routing.v1alpha1.DefaultInterface_DeletedResources,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name},DELETE,Status,default_interface,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name},GET,com.nokia.eda.routing.v1alpha1.DefaultInterface,default_interface,true,true,true
-/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name},PATCH,Patch,,false,false,false
+/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name},PATCH,com.nokia.eda.routing.v1alpha1.DefaultInterface,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name},PUT,com.nokia.eda.routing.v1alpha1.DefaultInterface,default_interface,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_revs,GET,ResourceHistory,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_targets,GET,IntentTargets,,false,false,false
@@ -23,7 +23,7 @@ Path,Method,Schema,Model Name,Supported,Datasource,Resource
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/_deleted,GET,com.nokia.eda.routing.v1alpha1.DefaultRouter_DeletedResources,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name},DELETE,Status,default_router,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name},GET,com.nokia.eda.routing.v1alpha1.DefaultRouter,default_router,true,true,true
-/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name},PATCH,Patch,,false,false,false
+/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name},PATCH,com.nokia.eda.routing.v1alpha1.DefaultRouter,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name},PUT,com.nokia.eda.routing.v1alpha1.DefaultRouter,default_router,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_revs,GET,ResourceHistory,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}/_targets,GET,IntentTargets,,false,false,false
@@ -35,7 +35,7 @@ Path,Method,Schema,Model Name,Supported,Datasource,Resource
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/_deleted,GET,com.nokia.eda.routing.v1alpha1.Drain_DeletedResources,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name},DELETE,Status,drain,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name},GET,com.nokia.eda.routing.v1alpha1.Drain,drain,true,true,true
-/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name},PATCH,Patch,,false,false,false
+/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name},PATCH,com.nokia.eda.routing.v1alpha1.Drain,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name},PUT,com.nokia.eda.routing.v1alpha1.Drain,drain,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_revs,GET,ResourceHistory,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}/_targets,GET,IntentTargets,,false,false,false
@@ -47,7 +47,7 @@ Path,Method,Schema,Model Name,Supported,Datasource,Resource
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/_deleted,GET,com.nokia.eda.routing.v1alpha1.SystemInterface_DeletedResources,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name},DELETE,Status,system_interface,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name},GET,com.nokia.eda.routing.v1alpha1.SystemInterface,system_interface,true,true,true
-/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name},PATCH,Patch,,false,false,false
+/apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name},PATCH,com.nokia.eda.routing.v1alpha1.SystemInterface,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name},PUT,com.nokia.eda.routing.v1alpha1.SystemInterface,system_interface,true,false,true
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_revs,GET,ResourceHistory,,false,false,false
 /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_targets,GET,IntentTargets,,false,false,false
@@ -85,5 +85,16 @@ Path,Method,Schema,Model Name,Supported,Datasource,Resource
 /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input,PUT,WorkflowInputData,,false,false,false
 /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_logs,GET,,,false,false,false
 /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_terminate,PUT,,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings,GET,com.nokia.eda.routing.v1alpha1.SystemPingList,system_ping_list,true,true,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings,POST,com.nokia.eda.routing.v1alpha1.SystemPing,system_ping,true,false,true
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name},DELETE,,system_ping,true,false,true
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name},GET,com.nokia.eda.routing.v1alpha1.SystemPing,system_ping,true,true,true
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_artifacts,GET,,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_artifacts/{artifact},GET,,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_input,GET,WorkflowGetInputsRespElem,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_input,PUT,WorkflowInputData,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_logs,GET,,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_terminate,PUT,,,false,false,false
 /workflows/v1/routing.eda.nokia.com/v1alpha1/routelookups,GET,com.nokia.eda.routing.v1alpha1.RouteLookupList,,false,false,false
 /workflows/v1/routing.eda.nokia.com/v1alpha1/routetraces,GET,com.nokia.eda.routing.v1alpha1.RouteTraceList,,false,false,false
+/workflows/v1/routing.eda.nokia.com/v1alpha1/systempings,GET,com.nokia.eda.routing.v1alpha1.SystemPingList,,false,false,false

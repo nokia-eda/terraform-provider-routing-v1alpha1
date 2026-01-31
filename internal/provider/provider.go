@@ -267,6 +267,8 @@ func (p *routingProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewRouteTraceListDataSource,
 		NewSystemInterfaceDataSource,
 		NewSystemInterfaceListDataSource,
+		NewSystemPingDataSource,
+		NewSystemPingListDataSource,
 		NewWorkflowGetInputsRespElemDataSource,
 	}
 }
@@ -280,5 +282,6 @@ func (p *routingProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewRouteLookupResource,
 		NewRouteTraceResource,
 		NewSystemInterfaceResource,
+		NewSystemPingResource,
 	}
 }

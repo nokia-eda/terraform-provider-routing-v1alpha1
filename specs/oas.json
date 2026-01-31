@@ -167,20 +167,56 @@
         "type": "array"
       },
       "K8SPatchOp": {
+        "description": "The definition for a JSON patch for a resource, as in RFC 6902",
         "properties": {
           "from": {
+            "description": "Only applies to a \"move\" operation, and is the path to the field/value within\nthe target JSON object that should be moved to the location specified by the \"path\"\nfield.",
+            "example": "/a/b/c",
             "type": "string"
           },
           "op": {
+            "description": "The type of operation this patch should perform.",
+            "enum": [
+              "add",
+              "remove",
+              "replace",
+              "move",
+              "copy",
+              "test"
+            ],
+            "example": "replace",
             "type": "string"
           },
           "path": {
+            "description": "The path to the field within the target JSON object\nthat should be patched according to the \"op\" field.",
+            "example": "/a/b/d",
             "type": "string"
           },
           "value": {
+            "description": "This field would be set to the value which the user intends to put in the\nfield referenced by the \"path\" field.  The type of the value should match\nthe type of the field as indicated by the schema of the resource being\npatched.",
+            "example": "example for a string field",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "object"
+              }
+            ],
             "type": "object"
           },
           "x-permissive": {
+            "description": "For an \"add\" operation, an already-present field referenced by the \"path\" will\nresult in an error unless this field is true.  Similarly for a non-existent\ntarget field of a \"remove\" operation.",
             "type": "boolean"
           }
         },
@@ -4249,6 +4285,474 @@
           "ui-title": "Metadata",
           "ui-title-key": "metadata"
         }
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemPing": {
+        "description": "SystemPing is the Schema for the systempings API",
+        "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing_alarms"
+          },
+          "apiVersion": {
+            "default": "routing.eda.nokia.com/v1alpha1",
+            "pattern": "^routing\\.eda\\.nokia\\.com/v1alpha1$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "ui-pattern-error": "The apiVersion must be set to routing.eda.nokia.com/v1alpha1",
+              "ui-visible-if": "false"
+            }
+          },
+          "deviations": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing_deviations"
+          },
+          "kind": {
+            "default": "SystemPing",
+            "pattern": "^SystemPing$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "ui-pattern-error": "The kind must be set to SystemPing",
+              "ui-visible-if": "false"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing_metadata"
+          },
+          "spec": {
+            "description": "SystemPing allows performing ping between systems to their system interfaces.",
+            "properties": {
+              "addressFamily": {
+                "default": "DualStack",
+                "description": "AddressFamily is the address family to use for the ping.\nIt can be one of the following values:\n- \"Ipv4\": Use Ipv4 addresses for the ping.\n- \"Ipv6\": Use Ipv6 addresses for the ping.\n- \"DualStack\": Use both Ipv4 and Ipv6 addresses for the ping.",
+                "enum": [
+                  "Ipv4",
+                  "Ipv6",
+                  "DualStack"
+                ],
+                "title": "Address Family",
+                "type": "string",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 300
+                }
+              },
+              "count": {
+                "default": 1,
+                "description": "Count is the number of pings to send.",
+                "title": "Count",
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 300,
+                  "ui-single-line-group": "CountTimeout"
+                }
+              },
+              "nodeSelectors": {
+                "description": "List of node selectors to select nodes whose system interfaces will be pinged.\nThis matches labels on TopoNode resources.\nIf no nodes  and no node selectors and no systemInterfaces as well no systemInterface selectors are specified,\nthen all nodes in the given namespace will be selected.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\"].",
+                "format": "labelselector",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Node Selectors",
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "core.eda.nokia.com",
+                      "kind": "TopoNode",
+                      "type": "labelselector"
+                    }
+                  ],
+                  "ui-order-priority": 200
+                }
+              },
+              "nodes": {
+                "description": "List of nodes whose system interfaces will be pinged.\nThis matches names of TopoNode resources.",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Nodes",
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "core.eda.nokia.com",
+                      "resource": "toponodes",
+                      "subject": true,
+                      "type": "gvr",
+                      "version": "v1"
+                    }
+                  ],
+                  "ui-order-priority": 100
+                }
+              },
+              "systemInterfaceSelectors": {
+                "description": "SystemInterface Selectors is a list of selectors to execute System pings for.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\", \"eda.nokia.com/region=us-west\"].",
+                "format": "labelselector",
+                "items": {
+                  "type": "string"
+                },
+                "title": "SystemInterfaces Selectors",
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "routing.eda.nokia.com",
+                      "kind": "SystemInterface",
+                      "type": "labelselector"
+                    }
+                  ]
+                }
+              },
+              "systemInterfaces": {
+                "description": "SystemInterfaces is a list of named SystemInterface resources to execute System pings for.",
+                "items": {
+                  "type": "string"
+                },
+                "title": "System Interfaces",
+                "type": "array",
+                "x-eda-nokia-com": {
+                  "ui-auto-completes": [
+                    {
+                      "condition": "true",
+                      "group": "routing.eda.nokia.com",
+                      "resource": "systeminterfaces",
+                      "subject": true,
+                      "type": "gvr",
+                      "version": "v1alpha1"
+                    }
+                  ]
+                }
+              },
+              "timeoutSeconds": {
+                "default": 5,
+                "description": "TimeoutSeconds is the timeout for the ping in seconds.",
+                "title": "Timeout Seconds",
+                "type": "integer",
+                "x-eda-nokia-com": {
+                  "ui-column-span": 2,
+                  "ui-order-priority": 400,
+                  "ui-single-line-group": "CountTimeout"
+                }
+              }
+            },
+            "title": "Specification",
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 30
+            }
+          },
+          "status": {
+            "description": "The result of the System ping",
+            "properties": {
+              "details": {
+                "description": "Details contains the results of the pings performed for each SystemInterface.\nEach entry in the list corresponds to a SystemInterface that was pinged.",
+                "items": {
+                  "properties": {
+                    "details": {
+                      "description": "Details of the ping result, if available.",
+                      "properties": {
+                        "averageTimeNanoseconds": {
+                          "description": "Average time taken for a ping reply.",
+                          "format": "int64",
+                          "title": "Average Time (ns)",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 200,
+                            "ui-single-line-group": "AverageTotal"
+                          }
+                        },
+                        "maxTimeNanoseconds": {
+                          "description": "Maximum time taken for a ping reply.",
+                          "format": "int64",
+                          "title": "Maximum Time (ns)",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 150,
+                            "ui-single-line-group": "MinMax"
+                          }
+                        },
+                        "minTimeNanoseconds": {
+                          "description": "Minimum time taken for a ping reply.",
+                          "format": "int64",
+                          "title": "Minimum Time (ns)",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 150,
+                            "ui-single-line-group": "MinMax"
+                          }
+                        },
+                        "received": {
+                          "description": "Number of pings received.",
+                          "title": "Received",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 100,
+                            "ui-single-line-group": "SentReceived"
+                          }
+                        },
+                        "sent": {
+                          "description": "Number of pings sent.",
+                          "title": "Sent",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 50,
+                            "ui-single-line-group": "SentReceived"
+                          }
+                        },
+                        "stdDevNanoseconds": {
+                          "description": "Standard deviation of time taken for all pings.",
+                          "format": "int64",
+                          "title": "Standard Deviation (ns)",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 300
+                          }
+                        },
+                        "totalTimeNanoseconds": {
+                          "description": "Total time taken for all pings.",
+                          "format": "int64",
+                          "title": "Total Time (ns)",
+                          "type": "integer",
+                          "x-eda-nokia-com": {
+                            "ui-column-span": 2,
+                            "ui-order-priority": 250,
+                            "ui-single-line-group": "AverageTotal"
+                          }
+                        }
+                      },
+                      "required": [
+                        "received",
+                        "sent"
+                      ],
+                      "title": "Details",
+                      "type": "object",
+                      "x-eda-nokia-com": {
+                        "ui-order-priority": 150
+                      }
+                    },
+                    "error": {
+                      "description": "Error message, if the ping failed.",
+                      "title": "Error",
+                      "type": "string",
+                      "x-eda-nokia-com": {
+                        "ui-order-priority": 200
+                      }
+                    },
+                    "name": {
+                      "description": "Name of the ping result.",
+                      "title": "Name",
+                      "type": "string",
+                      "x-eda-nokia-com": {
+                        "ui-column-span": 2,
+                        "ui-order-priority": 50
+                      }
+                    },
+                    "success": {
+                      "description": "Indicates if the ping was successful.",
+                      "title": "Success",
+                      "type": "boolean",
+                      "x-eda-nokia-com": {
+                        "ui-column-span": 2,
+                        "ui-order-priority": 100
+                      }
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "result": {
+                "description": "Result is the overall result of the ping operation.\nIt can be one of the following values:\n- \"Success\": All pings were successful.\n- \"Failed\": No pings were successful.\n- \"PartialSuccess\": Some pings were successful, but not all.",
+                "enum": [
+                  "Success",
+                  "Failed",
+                  "PartialSuccess"
+                ],
+                "title": "Result",
+                "type": "string"
+              }
+            },
+            "readOnly": true,
+            "title": "Status",
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 20
+            }
+          }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "metadata",
+          "spec"
+        ],
+        "type": "object"
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemPingList": {
+        "description": "SystemPingList is a list of systempings",
+        "properties": {
+          "apiVersion": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiVersion",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemPing_alarms": {
+        "properties": {
+          "critical": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Critical",
+              "ui-title-key": "alarm_severities.critical"
+            }
+          },
+          "major": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Major",
+              "ui-title-key": "alarm_severities.major"
+            }
+          },
+          "minor": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "minor",
+              "ui-title-key": "alarm_severities.minor"
+            }
+          },
+          "warning": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Warning",
+              "ui-title-key": "alarm_severities.warning"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 40,
+          "ui-title": "Alarms",
+          "ui-title-key": "alarms"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemPing_deviations": {
+        "properties": {
+          "count": {
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer",
+            "x-eda-nokia-com": {
+              "ui-title": "Count",
+              "ui-title-key": "count_column"
+            }
+          }
+        },
+        "readOnly": true,
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 25,
+          "ui-title": "Deviations",
+          "ui-title-key": "deviations"
+        }
+      },
+      "com.nokia.eda.routing.v1alpha1.SystemPing_metadata": {
+        "properties": {
+          "annotations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-order-priority": 40,
+              "ui-title": "Annotations",
+              "ui-title-key": "annotations"
+            }
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "x-eda-nokia-com": {
+              "ui-auto-completes": [
+                {
+                  "condition": "true",
+                  "group": "routing.eda.nokia.com",
+                  "kind": "SystemPing",
+                  "type": "label",
+                  "version": "v1alpha1"
+                }
+              ],
+              "ui-order-priority": 30,
+              "ui-title": "Labels",
+              "ui-title-key": "labels"
+            }
+          },
+          "name": {
+            "maxLength": 253,
+            "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+            "type": "string",
+            "x-eda-nokia-com": {
+              "immutable": true,
+              "ui-order-priority": 10,
+              "ui-pattern-error": "A valid name is made up of one or more components where each component is separated by period characters.  Each component must start and end with a lower case alphanumeric character and the body of the component is made up of zero or more lower case alphanumeric and hyphen characters.",
+              "ui-title": "Name",
+              "ui-title-key": "name"
+            }
+          },
+          "namespace": {
+            "type": "string",
+            "x-eda-nokia-com": {
+              "immutable": true,
+              "ui-order-priority": 20,
+              "ui-title": "Namespace",
+              "ui-title-key": "namespace"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "namespace"
+        ],
+        "type": "object",
+        "x-eda-nokia-com": {
+          "ui-order-priority": 10,
+          "ui-title": "Metadata",
+          "ui-title-key": "metadata"
+        }
       }
     },
     "securitySchemes": {
@@ -5168,7 +5672,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
                 "$ref": "#/components/schemas/Patch"
               }
@@ -5190,7 +5694,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "The response for a successful EDA resource patch operation."
           },
           "default": {
             "content": {
@@ -6144,7 +6648,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
                 "$ref": "#/components/schemas/Patch"
               }
@@ -6166,7 +6670,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "The response for a successful EDA resource patch operation."
           },
           "default": {
             "content": {
@@ -7120,7 +7624,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
                 "$ref": "#/components/schemas/Patch"
               }
@@ -7142,7 +7646,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "The response for a successful EDA resource patch operation."
           },
           "default": {
             "content": {
@@ -8096,7 +8600,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json-patch+json": {
               "schema": {
                 "$ref": "#/components/schemas/Patch"
               }
@@ -8118,7 +8622,7 @@
                 }
               }
             },
-            "description": "OK"
+            "description": "The response for a successful EDA resource patch operation."
           },
           "default": {
             "content": {
@@ -10581,6 +11085,624 @@
         ]
       }
     },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings": {
+      "get": {
+        "operationId": "wfListRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.",
+            "in": "query",
+            "name": "fields",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "an EQL \"where\" expression that will be used to filter the set of resources returned.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPingList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "List all SystemPing instances in this namespace.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "post": {
+        "description": "create a SystemPing",
+        "operationId": "wfCreateRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}": {
+      "delete": {
+        "operationId": "wfDeleteRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Delete a SystemPing workflow.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "get": {
+        "operationId": "wfReadRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPing"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read the specified SystemPing.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_artifacts": {
+      "get": {
+        "operationId": "wfListArtifactsRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "The response for a successful list artifacts request."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read list of artifacts generated by a SystemPing workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_artifacts/{artifact}": {
+      "get": {
+        "operationId": "wfReadArtifactRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "name of the artifact to download",
+            "in": "path",
+            "name": "artifact",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The binary content of the requested artifact."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read artifact generated by a SystemPing workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_input": {
+      "get": {
+        "operationId": "wfListInputRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkflowGetInputsRespElem"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "List containing specifications for this flow \u0026 subflow's requested input."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Get inputs requested by the SystemPing.",
+        "tags": [
+          "workflows"
+        ]
+      },
+      "put": {
+        "operationId": "wfSubmitInputRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowInputData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Submit input requested by the SystemPing.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_logs": {
+      "get": {
+        "operationId": "wfReadLogsRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The response for a successful GET logs request."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Read logs output by the SystemPing.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_terminate": {
+      "put": {
+        "operationId": "wfTerminateRoutingEdaNokiaComV1alpha1NamespaceSystempings",
+        "parameters": [
+          {
+            "description": "name of the SystemPing",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "the namespace scope in which to operate",
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "no data is returned for this response type."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "Terminate a SystemPing workflow.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
     "/workflows/v1/routing.eda.nokia.com/v1alpha1/routelookups": {
       "get": {
         "operationId": "wfListRoutingEdaNokiaComV1alpha1Routelookups",
@@ -10750,6 +11872,93 @@
           }
         },
         "summary": "List all RouteTrace instances.",
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/workflows/v1/routing.eda.nokia.com/v1alpha1/systempings": {
+      "get": {
+        "operationId": "wfListRoutingEdaNokiaComV1alpha1Systempings",
+        "parameters": [
+          {
+            "description": "client information for streaming request",
+            "in": "query",
+            "name": "eventclient",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "stream information for streaming request",
+            "in": "query",
+            "name": "stream",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched.",
+            "in": "query",
+            "name": "fields",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "an EQL \"where\" expression that will be used to filter the set of resources returned.",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "labelSelector",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "deprecated": true,
+            "description": "Deprecated: a label selector string to filter the results based on CR labels",
+            "in": "query",
+            "name": "label-selector",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPingList"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.nokia.eda.routing.v1alpha1.SystemPingList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Details of an error in response to an API REST request."
+          }
+        },
+        "summary": "List all SystemPing instances.",
         "tags": [
           "workflows"
         ]

@@ -4516,6 +4516,635 @@
             }
         },
         {
+            "name": "system_ping",
+            "schema": {
+                "attributes": [
+                    {
+                        "name": "name",
+                        "string": {
+                            "computed_optional_required": "required",
+                            "description": "name of the SystemPing"
+                        }
+                    },
+                    {
+                        "name": "namespace",
+                        "string": {
+                            "computed_optional_required": "required",
+                            "description": "the namespace scope in which to operate"
+                        }
+                    },
+                    {
+                        "name": "alarms",
+                        "single_nested": {
+                            "computed_optional_required": "computed",
+                            "attributes": [
+                                {
+                                    "name": "critical",
+                                    "int64": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                },
+                                {
+                                    "name": "major",
+                                    "int64": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                },
+                                {
+                                    "name": "minor",
+                                    "int64": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                },
+                                {
+                                    "name": "warning",
+                                    "int64": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "api_version",
+                        "string": {
+                            "computed_optional_required": "computed"
+                        }
+                    },
+                    {
+                        "name": "deviations",
+                        "single_nested": {
+                            "computed_optional_required": "computed",
+                            "attributes": [
+                                {
+                                    "name": "count",
+                                    "int64": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "kind",
+                        "string": {
+                            "computed_optional_required": "computed"
+                        }
+                    },
+                    {
+                        "name": "metadata",
+                        "single_nested": {
+                            "computed_optional_required": "computed",
+                            "attributes": [
+                                {
+                                    "name": "annotations",
+                                    "map": {
+                                        "computed_optional_required": "computed",
+                                        "element_type": {
+                                            "string": {}
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "labels",
+                                    "map": {
+                                        "computed_optional_required": "computed",
+                                        "element_type": {
+                                            "string": {}
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "name",
+                                    "string": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                },
+                                {
+                                    "name": "namespace",
+                                    "string": {
+                                        "computed_optional_required": "computed"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "spec",
+                        "single_nested": {
+                            "computed_optional_required": "optional",
+                            "attributes": [
+                                {
+                                    "name": "address_family",
+                                    "string": {
+                                        "computed_optional_required": "optional",
+                                        "description": "AddressFamily is the address family to use for the ping.\nIt can be one of the following values:\n- \"Ipv4\": Use Ipv4 addresses for the ping.\n- \"Ipv6\": Use Ipv6 addresses for the ping.\n- \"DualStack\": Use both Ipv4 and Ipv6 addresses for the ping."
+                                    }
+                                },
+                                {
+                                    "name": "count",
+                                    "int64": {
+                                        "computed_optional_required": "optional",
+                                        "description": "Count is the number of pings to send."
+                                    }
+                                },
+                                {
+                                    "name": "node_selectors",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "List of node selectors to select nodes whose system interfaces will be pinged.\nThis matches labels on TopoNode resources.\nIf no nodes  and no node selectors and no systemInterfaces as well no systemInterface selectors are specified,\nthen all nodes in the given namespace will be selected.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\"]."
+                                    }
+                                },
+                                {
+                                    "name": "nodes",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "List of nodes whose system interfaces will be pinged.\nThis matches names of TopoNode resources."
+                                    }
+                                },
+                                {
+                                    "name": "system_interface_selectors",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "SystemInterface Selectors is a list of selectors to execute System pings for.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\", \"eda.nokia.com/region=us-west\"]."
+                                    }
+                                },
+                                {
+                                    "name": "system_interfaces",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "SystemInterfaces is a list of named SystemInterface resources to execute System pings for."
+                                    }
+                                },
+                                {
+                                    "name": "timeout_seconds",
+                                    "int64": {
+                                        "computed_optional_required": "optional",
+                                        "description": "TimeoutSeconds is the timeout for the ping in seconds."
+                                    }
+                                }
+                            ],
+                            "description": "SystemPing allows performing ping between systems to their system interfaces."
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "single_nested": {
+                            "computed_optional_required": "computed",
+                            "attributes": [
+                                {
+                                    "name": "details",
+                                    "list_nested": {
+                                        "computed_optional_required": "computed",
+                                        "nested_object": {
+                                            "attributes": [
+                                                {
+                                                    "name": "details_1",
+                                                    "single_nested": {
+                                                        "computed_optional_required": "computed",
+                                                        "attributes": [
+                                                            {
+                                                                "name": "average_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Average time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "max_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Maximum time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "min_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Minimum time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "received",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Number of pings received."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "sent",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Number of pings sent."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "std_dev_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Standard deviation of time taken for all pings."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "total_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed",
+                                                                    "description": "Total time taken for all pings."
+                                                                }
+                                                            }
+                                                        ],
+                                                        "description": "Details of the ping result, if available."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "error",
+                                                    "string": {
+                                                        "computed_optional_required": "computed",
+                                                        "description": "Error message, if the ping failed."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "string": {
+                                                        "computed_optional_required": "computed",
+                                                        "description": "Name of the ping result."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "success",
+                                                    "bool": {
+                                                        "computed_optional_required": "computed",
+                                                        "description": "Indicates if the ping was successful."
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "description": "Details contains the results of the pings performed for each SystemInterface.\nEach entry in the list corresponds to a SystemInterface that was pinged."
+                                    }
+                                },
+                                {
+                                    "name": "result",
+                                    "string": {
+                                        "computed_optional_required": "computed",
+                                        "description": "Result is the overall result of the ping operation.\nIt can be one of the following values:\n- \"Success\": All pings were successful.\n- \"Failed\": No pings were successful.\n- \"PartialSuccess\": Some pings were successful, but not all."
+                                    }
+                                }
+                            ],
+                            "description": "The result of the System ping"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "system_ping_list",
+            "schema": {
+                "attributes": [
+                    {
+                        "name": "fields",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "a comma-separated list of resource fields to fetch/return.  If unspecified, all fields are fetched.  If empty, only key-fields are fetched."
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "an EQL \"where\" expression that will be used to filter the set of resources returned."
+                        }
+                    },
+                    {
+                        "name": "label_selector",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "a label selector string to filter the results based on CR labels"
+                        }
+                    },
+                    {
+                        "name": "labelselector",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "Deprecated: a label selector string to filter the results based on CR labels"
+                        }
+                    },
+                    {
+                        "name": "namespace",
+                        "string": {
+                            "computed_optional_required": "required",
+                            "description": "the namespace scope in which to operate"
+                        }
+                    },
+                    {
+                        "name": "api_version",
+                        "string": {
+                            "computed_optional_required": "computed"
+                        }
+                    },
+                    {
+                        "name": "items",
+                        "list_nested": {
+                            "computed_optional_required": "computed",
+                            "nested_object": {
+                                "attributes": [
+                                    {
+                                        "name": "alarms",
+                                        "single_nested": {
+                                            "computed_optional_required": "computed",
+                                            "attributes": [
+                                                {
+                                                    "name": "critical",
+                                                    "int64": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "major",
+                                                    "int64": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "minor",
+                                                    "int64": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "warning",
+                                                    "int64": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "api_version",
+                                        "string": {
+                                            "computed_optional_required": "computed"
+                                        }
+                                    },
+                                    {
+                                        "name": "deviations",
+                                        "single_nested": {
+                                            "computed_optional_required": "computed",
+                                            "attributes": [
+                                                {
+                                                    "name": "count",
+                                                    "int64": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "kind",
+                                        "string": {
+                                            "computed_optional_required": "computed"
+                                        }
+                                    },
+                                    {
+                                        "name": "metadata",
+                                        "single_nested": {
+                                            "computed_optional_required": "computed",
+                                            "attributes": [
+                                                {
+                                                    "name": "annotations",
+                                                    "map": {
+                                                        "computed_optional_required": "computed",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "name": "labels",
+                                                    "map": {
+                                                        "computed_optional_required": "computed",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "string": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "namespace",
+                                                    "string": {
+                                                        "computed_optional_required": "computed"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "spec",
+                                        "single_nested": {
+                                            "computed_optional_required": "optional",
+                                            "attributes": [
+                                                {
+                                                    "name": "address_family",
+                                                    "string": {
+                                                        "computed_optional_required": "optional",
+                                                        "description": "AddressFamily is the address family to use for the ping.\nIt can be one of the following values:\n- \"Ipv4\": Use Ipv4 addresses for the ping.\n- \"Ipv6\": Use Ipv6 addresses for the ping.\n- \"DualStack\": Use both Ipv4 and Ipv6 addresses for the ping."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "count",
+                                                    "int64": {
+                                                        "computed_optional_required": "optional",
+                                                        "description": "Count is the number of pings to send."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "node_selectors",
+                                                    "list": {
+                                                        "computed_optional_required": "optional",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        },
+                                                        "description": "List of node selectors to select nodes whose system interfaces will be pinged.\nThis matches labels on TopoNode resources.\nIf no nodes  and no node selectors and no systemInterfaces as well no systemInterface selectors are specified,\nthen all nodes in the given namespace will be selected.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\"]."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "nodes",
+                                                    "list": {
+                                                        "computed_optional_required": "optional",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        },
+                                                        "description": "List of nodes whose system interfaces will be pinged.\nThis matches names of TopoNode resources."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "system_interface_selectors",
+                                                    "list": {
+                                                        "computed_optional_required": "optional",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        },
+                                                        "description": "SystemInterface Selectors is a list of selectors to execute System pings for.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\", \"eda.nokia.com/region=us-west\"]."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "system_interfaces",
+                                                    "list": {
+                                                        "computed_optional_required": "optional",
+                                                        "element_type": {
+                                                            "string": {}
+                                                        },
+                                                        "description": "SystemInterfaces is a list of named SystemInterface resources to execute System pings for."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "timeout_seconds",
+                                                    "int64": {
+                                                        "computed_optional_required": "optional",
+                                                        "description": "TimeoutSeconds is the timeout for the ping in seconds."
+                                                    }
+                                                }
+                                            ],
+                                            "description": "SystemPing allows performing ping between systems to their system interfaces."
+                                        }
+                                    },
+                                    {
+                                        "name": "status",
+                                        "single_nested": {
+                                            "computed_optional_required": "computed",
+                                            "attributes": [
+                                                {
+                                                    "name": "details",
+                                                    "list_nested": {
+                                                        "computed_optional_required": "computed",
+                                                        "nested_object": {
+                                                            "attributes": [
+                                                                {
+                                                                    "name": "details_1",
+                                                                    "single_nested": {
+                                                                        "computed_optional_required": "computed",
+                                                                        "attributes": [
+                                                                            {
+                                                                                "name": "average_time_nanoseconds",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Average time taken for a ping reply."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "max_time_nanoseconds",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Maximum time taken for a ping reply."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "min_time_nanoseconds",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Minimum time taken for a ping reply."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "received",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Number of pings received."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "sent",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Number of pings sent."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "std_dev_nanoseconds",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Standard deviation of time taken for all pings."
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "total_time_nanoseconds",
+                                                                                "int64": {
+                                                                                    "computed_optional_required": "computed",
+                                                                                    "description": "Total time taken for all pings."
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        "description": "Details of the ping result, if available."
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "error",
+                                                                    "string": {
+                                                                        "computed_optional_required": "computed",
+                                                                        "description": "Error message, if the ping failed."
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "name",
+                                                                    "string": {
+                                                                        "computed_optional_required": "computed",
+                                                                        "description": "Name of the ping result."
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "success",
+                                                                    "bool": {
+                                                                        "computed_optional_required": "computed",
+                                                                        "description": "Indicates if the ping was successful."
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "description": "Details contains the results of the pings performed for each SystemInterface.\nEach entry in the list corresponds to a SystemInterface that was pinged."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "result",
+                                                    "string": {
+                                                        "computed_optional_required": "computed",
+                                                        "description": "Result is the overall result of the ping operation.\nIt can be one of the following values:\n- \"Success\": All pings were successful.\n- \"Failed\": No pings were successful.\n- \"PartialSuccess\": Some pings were successful, but not all."
+                                                    }
+                                                }
+                                            ],
+                                            "description": "The result of the System ping"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "kind",
+                        "string": {
+                            "computed_optional_required": "computed"
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "workflow_get_inputs_resp_elem",
             "schema": {
                 "attributes": [
@@ -7350,6 +7979,393 @@
                         "string": {
                             "computed_optional_required": "computed_optional",
                             "description": "name of the SystemInterface"
+                        }
+                    },
+                    {
+                        "name": "namespace",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "the namespace scope in which to operate"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "system_ping",
+            "schema": {
+                "attributes": [
+                    {
+                        "name": "alarms",
+                        "single_nested": {
+                            "computed_optional_required": "computed_optional",
+                            "attributes": [
+                                {
+                                    "name": "critical",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional"
+                                    }
+                                },
+                                {
+                                    "name": "major",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional"
+                                    }
+                                },
+                                {
+                                    "name": "minor",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional"
+                                    }
+                                },
+                                {
+                                    "name": "warning",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "api_version",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "default": {
+                                "static": "routing.eda.nokia.com/v1alpha1"
+                            },
+                            "validators": [
+                                {
+                                    "custom": {
+                                        "imports": [
+                                            {
+                                                "path": "regexp"
+                                            },
+                                            {
+                                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                            }
+                                        ],
+                                        "schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^routing\\\\.eda\\\\.nokia\\\\.com/v1alpha1$\"), \"\")"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "deviations",
+                        "single_nested": {
+                            "computed_optional_required": "computed_optional",
+                            "attributes": [
+                                {
+                                    "name": "count",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "kind",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "default": {
+                                "static": "SystemPing"
+                            },
+                            "validators": [
+                                {
+                                    "custom": {
+                                        "imports": [
+                                            {
+                                                "path": "regexp"
+                                            },
+                                            {
+                                                "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                            }
+                                        ],
+                                        "schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^SystemPing$\"), \"\")"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "metadata",
+                        "single_nested": {
+                            "computed_optional_required": "required",
+                            "attributes": [
+                                {
+                                    "name": "annotations",
+                                    "map": {
+                                        "computed_optional_required": "computed_optional",
+                                        "element_type": {
+                                            "string": {}
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "labels",
+                                    "map": {
+                                        "computed_optional_required": "computed_optional",
+                                        "element_type": {
+                                            "string": {}
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "name",
+                                    "string": {
+                                        "computed_optional_required": "required",
+                                        "validators": [
+                                            {
+                                                "custom": {
+                                                    "imports": [
+                                                        {
+                                                            "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                                        }
+                                                    ],
+                                                    "schema_definition": "stringvalidator.LengthAtMost(253)"
+                                                }
+                                            },
+                                            {
+                                                "custom": {
+                                                    "imports": [
+                                                        {
+                                                            "path": "regexp"
+                                                        },
+                                                        {
+                                                            "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                                        }
+                                                    ],
+                                                    "schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"), \"\")"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "namespace",
+                                    "string": {
+                                        "computed_optional_required": "required"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "spec",
+                        "single_nested": {
+                            "computed_optional_required": "required",
+                            "attributes": [
+                                {
+                                    "name": "address_family",
+                                    "string": {
+                                        "computed_optional_required": "computed_optional",
+                                        "default": {
+                                            "static": "DualStack"
+                                        },
+                                        "description": "AddressFamily is the address family to use for the ping.\nIt can be one of the following values:\n- \"Ipv4\": Use Ipv4 addresses for the ping.\n- \"Ipv6\": Use Ipv6 addresses for the ping.\n- \"DualStack\": Use both Ipv4 and Ipv6 addresses for the ping.",
+                                        "validators": [
+                                            {
+                                                "custom": {
+                                                    "imports": [
+                                                        {
+                                                            "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                                        }
+                                                    ],
+                                                    "schema_definition": "stringvalidator.OneOf(\n\"Ipv4\",\n\"Ipv6\",\n\"DualStack\",\n)"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "count",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional",
+                                        "default": {
+                                            "static": 1
+                                        },
+                                        "description": "Count is the number of pings to send."
+                                    }
+                                },
+                                {
+                                    "name": "node_selectors",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "List of node selectors to select nodes whose system interfaces will be pinged.\nThis matches labels on TopoNode resources.\nIf no nodes  and no node selectors and no systemInterfaces as well no systemInterface selectors are specified,\nthen all nodes in the given namespace will be selected.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\"]."
+                                    }
+                                },
+                                {
+                                    "name": "nodes",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "List of nodes whose system interfaces will be pinged.\nThis matches names of TopoNode resources."
+                                    }
+                                },
+                                {
+                                    "name": "system_interface_selectors",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "SystemInterface Selectors is a list of selectors to execute System pings for.\nThis is a list of label expressions, e.g. [\"eda.nokia.com/role=leaf\", \"eda.nokia.com/region=us-west\"]."
+                                    }
+                                },
+                                {
+                                    "name": "system_interfaces",
+                                    "list": {
+                                        "computed_optional_required": "optional",
+                                        "element_type": {
+                                            "string": {}
+                                        },
+                                        "description": "SystemInterfaces is a list of named SystemInterface resources to execute System pings for."
+                                    }
+                                },
+                                {
+                                    "name": "timeout_seconds",
+                                    "int64": {
+                                        "computed_optional_required": "computed_optional",
+                                        "default": {
+                                            "static": 5
+                                        },
+                                        "description": "TimeoutSeconds is the timeout for the ping in seconds."
+                                    }
+                                }
+                            ],
+                            "description": "SystemPing allows performing ping between systems to their system interfaces."
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "single_nested": {
+                            "computed_optional_required": "computed_optional",
+                            "attributes": [
+                                {
+                                    "name": "details",
+                                    "list_nested": {
+                                        "computed_optional_required": "computed_optional",
+                                        "nested_object": {
+                                            "attributes": [
+                                                {
+                                                    "name": "details_1",
+                                                    "single_nested": {
+                                                        "computed_optional_required": "computed_optional",
+                                                        "attributes": [
+                                                            {
+                                                                "name": "average_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed_optional",
+                                                                    "description": "Average time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "max_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed_optional",
+                                                                    "description": "Maximum time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "min_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed_optional",
+                                                                    "description": "Minimum time taken for a ping reply."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "received",
+                                                                "int64": {
+                                                                    "computed_optional_required": "required",
+                                                                    "description": "Number of pings received."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "sent",
+                                                                "int64": {
+                                                                    "computed_optional_required": "required",
+                                                                    "description": "Number of pings sent."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "std_dev_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed_optional",
+                                                                    "description": "Standard deviation of time taken for all pings."
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "total_time_nanoseconds",
+                                                                "int64": {
+                                                                    "computed_optional_required": "computed_optional",
+                                                                    "description": "Total time taken for all pings."
+                                                                }
+                                                            }
+                                                        ],
+                                                        "description": "Details of the ping result, if available."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "error",
+                                                    "string": {
+                                                        "computed_optional_required": "computed_optional",
+                                                        "description": "Error message, if the ping failed."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "string": {
+                                                        "computed_optional_required": "computed_optional",
+                                                        "description": "Name of the ping result."
+                                                    }
+                                                },
+                                                {
+                                                    "name": "success",
+                                                    "bool": {
+                                                        "computed_optional_required": "required",
+                                                        "description": "Indicates if the ping was successful."
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "description": "Details contains the results of the pings performed for each SystemInterface.\nEach entry in the list corresponds to a SystemInterface that was pinged."
+                                    }
+                                },
+                                {
+                                    "name": "result",
+                                    "string": {
+                                        "computed_optional_required": "computed_optional",
+                                        "description": "Result is the overall result of the ping operation.\nIt can be one of the following values:\n- \"Success\": All pings were successful.\n- \"Failed\": No pings were successful.\n- \"PartialSuccess\": Some pings were successful, but not all.",
+                                        "validators": [
+                                            {
+                                                "custom": {
+                                                    "imports": [
+                                                        {
+                                                            "path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+                                                        }
+                                                    ],
+                                                    "schema_definition": "stringvalidator.OneOf(\n\"Success\",\n\"Failed\",\n\"PartialSuccess\",\n)"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "description": "The result of the System ping"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "string": {
+                            "computed_optional_required": "computed_optional",
+                            "description": "name of the SystemPing"
                         }
                     },
                     {

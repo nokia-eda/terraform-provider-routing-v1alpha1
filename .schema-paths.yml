@@ -31,20 +31,6 @@ k8_s_topology_request:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}/_topology
       method: POST
 
-patch:
-  - update:
-      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
-      method: PATCH
-  - update:
-      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
-      method: PATCH
-  - update:
-      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
-      method: PATCH
-  - update:
-      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
-      method: PATCH
-
 resource_history:
   - read:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}/_revs
@@ -107,6 +93,9 @@ workflow_get_inputs_resp_elem:
   - read:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input
       method: GET
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_input
+      method: GET
 
 workflow_input_data:
   - update:
@@ -117,6 +106,9 @@ workflow_input_data:
       method: PUT
   - update:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/routetraces/{name}/_input
+      method: PUT
+  - update:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}/_input
       method: PUT
 
 com.nokia.eda.routing.v1alpha1.attachment_lookup:
@@ -145,6 +137,9 @@ com.nokia.eda.routing.v1alpha1.default_interface:
   - update:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
       method: PUT
+  - update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultinterfaces/{name}
+      method: PATCH
 
 com.nokia.eda.routing.v1alpha1.default_interface_list:
   - read:
@@ -172,6 +167,9 @@ com.nokia.eda.routing.v1alpha1.default_router:
   - update:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
       method: PUT
+  - update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/defaultrouters/{name}
+      method: PATCH
 
 com.nokia.eda.routing.v1alpha1.default_router_list:
   - read:
@@ -199,6 +197,9 @@ com.nokia.eda.routing.v1alpha1.drain:
   - update:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
       method: PUT
+  - update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/drains/{name}
+      method: PATCH
 
 com.nokia.eda.routing.v1alpha1.drain_list:
   - read:
@@ -258,6 +259,9 @@ com.nokia.eda.routing.v1alpha1.system_interface:
   - update:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
       method: PUT
+  - update:
+      path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: PATCH
 
 com.nokia.eda.routing.v1alpha1.system_interface_list:
   - read:
@@ -275,10 +279,26 @@ com.nokia.eda.routing.v1alpha1.system_interface_deleted_resources:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/_deleted
       method: GET
 
-totalPaths: 55
-totalSchemas: 94
-usedSchemas: 29
-unusedSchemas: 65
+com.nokia.eda.routing.v1alpha1.system_ping:
+  - create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings
+      method: POST
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}
+      method: GET
+
+com.nokia.eda.routing.v1alpha1.system_ping_list:
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings
+      method: GET
+  - read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/systempings
+      method: GET
+
+totalPaths: 63
+totalSchemas: 99
+usedSchemas: 30
+unusedSchemas: 69
 unusedSchemaList:
   - AppGroupVersion
   - ErrorIndex
@@ -287,6 +307,7 @@ unusedSchemaList:
   - IntentTarget
   - K8SPatchOp
   - OverlayState
+  - Patch
   - Resource
   - ResourceHistoryEntry
   - StatusDetails
@@ -345,3 +366,6 @@ unusedSchemaList:
   - com.nokia.eda.routing.v1alpha1.SystemInterface_alarms
   - com.nokia.eda.routing.v1alpha1.SystemInterface_deviations
   - com.nokia.eda.routing.v1alpha1.SystemInterface_metadata
+  - com.nokia.eda.routing.v1alpha1.SystemPing_alarms
+  - com.nokia.eda.routing.v1alpha1.SystemPing_deviations
+  - com.nokia.eda.routing.v1alpha1.SystemPing_metadata

@@ -82,6 +82,16 @@ data_sources:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces
       method: GET
 
+  system_ping:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}
+      method: GET
+
+  system_ping_list:
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings
+      method: GET
+
   workflow_get_inputs_resp_elem:
     read:
       path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/attachmentlookups/{name}/_input
@@ -175,4 +185,15 @@ resources:
       method: PUT
     delete:
       path: /apps/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systeminterfaces/{name}
+      method: DELETE
+
+  system_ping:
+    create:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings
+      method: POST
+    read:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}
+      method: GET
+    delete:
+      path: /workflows/v1/routing.eda.nokia.com/v1alpha1/namespaces/{namespace}/systempings/{name}
       method: DELETE
